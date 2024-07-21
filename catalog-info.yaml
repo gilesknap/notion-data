@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: notiondata
+  title: notiondata
+  description: Python data classes to represent notion API objects
+spec:
+  type: documentation
+  lifecycle: experimental
+  owner: group:default/sscc
