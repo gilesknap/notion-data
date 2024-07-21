@@ -1,8 +1,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: notiondata
-  title: notiondata
+  name: notion-data
+  title: notion-data
   description: Python data classes to represent notion API objects
 spec:
   type: documentation

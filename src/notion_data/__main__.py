@@ -11,6 +11,6 @@ def main(args=None):
     args = parser.parse_args(args)
 
 
-# test with: python -m notiondata
+# test with: python -m notion_data
 if __name__ == "__main__":
     main()

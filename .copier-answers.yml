@@ -5,12 +5,12 @@ author_email: gilesknap@gmail.com
 author_name: Giles Knap
 component_owner: group:default/sscc
 description: Python data classes to represent notion API objects
-distribution_name: notiondata
+distribution_name: notion-data
 docker: false
 docs_type: README
 git_platform: github.com
 github_org: gilesknap
-package_name: notiondata
+package_name: notion_data
 pypi: true
-repo_name: notiondata
+repo_name: notion-data
 type_checker: mypy
