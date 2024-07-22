@@ -7,9 +7,9 @@ https://developers.notion.com/reference/block
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, RootModel, model_validator, root_validator
+from pydantic import Field, RootModel, model_validator
 
 from .enums import Color, Language
 from .file import FileObject
@@ -206,17 +206,6 @@ class Paragraph(_BlockCommon):
     children: list[_ChildBlockUnion] | None = None
 
 
-class Todo(_BlockCommon):
-    class TodoData(Root):
-        rich_text: RichText
-        checked: bool = False
-        color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
-
-    type: Literal["to_do"]
-    to_do: TodoData
-
-
 class Quote(_BlockCommon):
     class _QuoteData(Root):
         rich_text: RichText
@@ -257,9 +246,38 @@ class TableRow(_BlockCommon):
     table_row: _TableRowData
 
 
+class Todo(_BlockCommon):
+    class TodoData(Root):
+        rich_text: RichText
+        checked: bool = False
+        color: Color = Color.DEFAULT
+        children: list[_ChildBlockUnion] | None = None
+
+    type: Literal["to_do"]
+    to_do: TodoData
+
+
+class Toggle(_BlockCommon):
+    class _ToggleData(Root):
+        rich_text: RichText
+        color: Color = Color.DEFAULT
+        children: list[_ChildBlockUnion] | None = None
+
+    type: Literal["toggle"]
+    toggle: _ToggleData
+
+
+class Video(_BlockCommon):
+    class _VideoData(Root):
+        file: FileObject
+
+    type: Literal["video"]
+    video: _VideoData
+
+
 """ Block is union of all block types, discriminated by type literal """
-_BlockUnion = Annotated[
-    Union[tuple(_BlockCommon.__subclasses__())],
+_BlockUnion: TypeAlias = Annotated[  # type: ignore
+    Union[tuple(_BlockCommon.__subclasses__())],  # type: ignore
     Field(discriminator="type", description="union of block types"),
 ]
 
@@ -271,7 +289,7 @@ _BlockUnion = Annotated[
     (unfortunately discriminators are applied before the model validator
     so we can't use type here even though the validator is adding it)
 """
-_ChildBlockUnion = Annotated[
-    Union[tuple(_BlockCommon.__subclasses__())],
+_ChildBlockUnion: TypeAlias = Annotated[  # type: ignore
+    Union[tuple(_BlockCommon.__subclasses__())],  # type: ignore
     Field(description="union of block types"),
 ]

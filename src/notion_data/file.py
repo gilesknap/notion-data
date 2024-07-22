@@ -5,7 +5,7 @@ https://developers.notion.com/reference/file-object
 """
 
 from datetime import datetime
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal, TypeAlias, Union
 
 from pydantic import Field
 
@@ -46,7 +46,7 @@ class PDF(_FileCommon):
     pdf: FileExternal
 
 
-FileObject = Annotated[
-    Union[tuple(_FileCommon.__subclasses__())],
+FileObject: TypeAlias = Annotated[  # type: ignore
+    Union[tuple(_FileCommon.__subclasses__())],  # type: ignore
     Field(discriminator="type", description="union of arg types"),
 ]
