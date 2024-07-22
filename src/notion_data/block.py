@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, Union
 
-from pydantic import Field, RootModel
+from pydantic import Field, RootModel, model_validator, root_validator
 
 from .enums import Color, Language
 from .file import FileObject
@@ -27,11 +27,13 @@ class Block(RootModel):
 class _BlockCommon(Root):
     """A block in Notion"""
 
-    object: Literal["block"]
+    # child block objects do not require type
+    object: Literal["block"] | None = None
     id: str | None = Field(
         default=None, description="The ID of the block", pattern=UUIDv4
     )
-    parent: Parent
+    # child block objects do not require parent
+    parent: Parent | None = None
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
     created_by: NotionUser | None = None
@@ -39,6 +41,15 @@ class _BlockCommon(Root):
     has_children: bool = False
     archived: bool = False
     in_trash: bool = False
+
+    @model_validator(mode="before")
+    # for child blocks, type is not required so insert it
+    # so that the discriminator is present
+    def insert_type(cls, values):
+        if "type" not in values:
+            # type is the first and only key in the dict
+            values["type"] = list(values)[0]
+        return values
 
 
 class Bookmark(_BlockCommon):
@@ -59,7 +70,7 @@ class BulletedListItem(_BlockCommon):
     class _BulletedData(Root):
         rich_text: RichText
         color: Color = Color.DEFAULT
-        children: list[_BlockUnion]
+        children: list[_ChildBlockUnion] | None = None
 
     type: Literal["bulleted_list_item"]
     bulleted_list_item: RichText
@@ -158,11 +169,41 @@ class Heading3(_BlockCommon):
     heading_3: _HeadingData
 
 
+class Image(_BlockCommon):
+    class _ImageData(Root):
+        file: FileObject
+
+    type: Literal["image"]
+    image: _ImageData
+
+
+class LinkPreview(_BlockCommon):
+    """
+    Cannot be created by the API, only returned in the context of a page.
+    """
+
+    class _LinkPreviewData(Root):
+        url: str
+
+    type: Literal["link_preview"]
+    link_to: _LinkPreviewData
+
+
+class NumberedListItem(_BlockCommon):
+    class _NumberedListItemData(Root):
+        rich_text: RichText
+        color: Color = Color.DEFAULT
+        children: list[_ChildBlockUnion] | None = None
+
+    type: Literal["numbered_list_item"]
+    numbered_list_item: _NumberedListItemData
+
+
 class Paragraph(_BlockCommon):
     type: Literal["paragraph"]
     paragraph: RichText
     color: Color = Color.DEFAULT
-    children: list[_BlockUnion] | None = None
+    children: list[_ChildBlockUnion] | None = None
 
 
 class Todo(_BlockCommon):
@@ -170,14 +211,49 @@ class Todo(_BlockCommon):
         rich_text: RichText
         checked: bool = False
         color: Color = Color.DEFAULT
-        children: list[_BlockUnion]
+        children: list[_ChildBlockUnion] | None = None
 
     type: Literal["to_do"]
     to_do: TodoData
 
 
+class Quote(_BlockCommon):
+    class _QuoteData(Root):
+        rich_text: RichText
+        color: Color = Color.DEFAULT
+        children: list[_ChildBlockUnion] | None = None
+
+    type: Literal["quote"]
+    quote: _QuoteData
+
+
+class SyncedBlock(_BlockCommon):
+    class _SyncedBlockData(Root):
+        class _SyncedFrom(Root):
+            block_id: str = Field(description="The ID of the block", pattern=UUIDv4)
+
+        synced_from: _SyncedFrom | None
+        children: list[_ChildBlockUnion] | None = None
+
+    type: Literal["synced_block"]
+    synced_block: _SyncedBlockData
+
+
 """ Block is union of all block types, discriminated by type literal """
 _BlockUnion = Annotated[
     Union[tuple(_BlockCommon.__subclasses__())],
-    Field(discriminator="type", description="union of arg types"),
+    Field(discriminator="type", description="union of block types"),
+]
+
+""" ChildBlocks do not have type so can't use it as a discriminator.
+    In the model validator for these we insert the type so that
+    Pytdantic can resolve the subclass of the Union - just not as easilty as
+    with the discriminator.
+
+    (unfortunately discriminators are applied before the model validator
+    so we can't use type here even though the validator is adding it)
+"""
+_ChildBlockUnion = Annotated[
+    Union[tuple(_BlockCommon.__subclasses__())],
+    Field(description="union of block types"),
 ]

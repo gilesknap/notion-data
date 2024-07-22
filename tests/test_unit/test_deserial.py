@@ -77,3 +77,36 @@ def test_file(data_folder):
     block = Block(**data)
     assert block.root.object == "block"
     assert block.root.file.external.url == "https://companywebsite.com/files/doc.txt"
+
+
+def test_synced_from(data_folder):
+    """
+    example: https://developers.notion.com/reference/block
+    """
+    p = data_folder / "synced_from.json"
+    with p.open() as f:
+        data = json.load(f)
+
+    block = Block(**data)
+    assert block.root.object == "block"
+    assert (
+        block.root.synced_block.synced_from.block_id
+        == "29833787-2cf9-4fdf-8782-e53db20768a5"
+    )
+
+
+def test_synced_to(data_folder):
+    """
+    example: https://developers.notion.com/reference/block
+    """
+    p = data_folder / "synced_to.json"
+    with p.open() as f:
+        data = json.load(f)
+
+    block = Block(**data)
+    assert block.root.object == "block"
+    assert block.root.synced_block.synced_from is None
+    assert (
+        block.root.synced_block.children[0].callout.rich_text[0].text.content
+        == "Callout in synced block"
+    )
