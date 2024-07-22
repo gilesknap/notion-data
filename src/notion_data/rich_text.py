@@ -12,7 +12,7 @@ from pydantic import Field
 
 from .root import Root
 
-# TODO href and color should be typed as ?? / enum
+# TODO href should be typed ??
 
 
 class BaseRichText(Root):

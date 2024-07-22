@@ -13,10 +13,14 @@ class Page(Root):
     block: Block
 
 
-def test_paragraph(data_folder):
-    p = data_folder / "paragraph.json"
+def test_block(data_folder):
+    """
+    example: https://developers.notion.com/reference/block
+    """
+    p = data_folder / "block.json"
     with p.open() as f:
         data = json.load(f)
 
     block = Block(**data)
     assert block.root.object == "block"
+    assert block.root.heading_2.rich_text[0].plain_text == "Lacinato kale"
