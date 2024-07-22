@@ -18,5 +18,5 @@ def test_paragraph(data_folder):
     with p.open() as f:
         data = json.load(f)
 
-    page = Page(**data)
-    assert page.block.object == "block"
+    block = Block(**data)
+    assert block.root.object == "block"

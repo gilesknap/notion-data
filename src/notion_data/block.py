@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import Field
+from pydantic import Field, RootModel
 
 from .identify import NotionUser
 from .parent import Parent
@@ -19,7 +19,11 @@ from .rich_text import RichText
 from .root import Root
 
 
-class BlockType(Enum):
+class Block(RootModel):
+    root: BlockUnion
+
+
+class BlockEnum(Enum):
     BOOKMARK = "bookmark"
     BREADCRUMB = "breadcrumb"
     BULLETED_LIST_ITEM = "bulleted_list_item"
@@ -46,7 +50,7 @@ class BlockType(Enum):
     TABLE = "table"
     TABLE_OF_CONTENTS = "table_of_contents"
     TABLE_ROW = "table_row"
-    TEMPLATE = "template"
+    TEMPLATE = "template"  # deprecated - w
     TO_DO = "to_do"
     TOGGLE = "toggle"
     UNSUPPORTED = "unsupported"
@@ -68,21 +72,32 @@ class BlockCommon(Root):
     in_trash: bool = False
 
 
-class Heading2(BlockCommon):
-    class Heading2Data(Root):
-        rich_text: RichText
-        color: str = "default"
-        is_togglable: bool = False
+class _HeadingData(Root):
+    rich_text: RichText
+    color: str = "default"
+    is_toggleable: bool = False
 
+
+class Heading1(BlockCommon):
+    type: Literal["heading_1"]
+    heading_1: _HeadingData
+
+
+class Heading2(BlockCommon):
     type: Literal["heading_2"]
-    heading_2: Heading2Data
+    heading_2: _HeadingData
+
+
+class Heading3(BlockCommon):
+    type: Literal["heading_3"]
+    heading_3: _HeadingData
 
 
 class Paragraph(BlockCommon):
     type: Literal["paragraph"]
     paragraph: RichText
     color: str = "default"
-    children: list[Block] | None = None
+    children: list[BlockUnion] | None = None
 
 
 class Todo(BlockCommon):
@@ -90,7 +105,7 @@ class Todo(BlockCommon):
         rich_text: RichText
         checked: bool = False
         color: str = "default"
-        children: list[Block]
+        children: list[BlockUnion]
 
     type: Literal["to_do"]
     to_do: TodoData
@@ -98,7 +113,7 @@ class Todo(BlockCommon):
 
 """ Block is union of all block types, discriminated by type literal """
 # TODO iterate over the subclasses of BlockCommon instead of hardcoding them
-Block = Annotated[
+BlockUnion = Annotated[
     Heading2 | Paragraph | Todo,
     Field(discriminator="type", description="union of arg types"),
 ]
