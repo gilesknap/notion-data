@@ -18,15 +18,15 @@ from .root import Root
 class BaseRichText(Root):
     """A base class for all rich text objects"""
 
-    annotations: Annotations
-    plain_text: str
-    href: str | None
+    annotations: Annotations | None = None
+    plain_text: str | None = None
+    href: str | None = None
 
 
 class TextObject(BaseRichText):
     class TextObjectData(Root):
         content: str
-        link: str | None
+        link: str | None = None
 
     type: Literal["text"]
     text: TextObjectData

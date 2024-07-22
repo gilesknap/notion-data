@@ -1,0 +1,12 @@
+{
+    "object": "block",
+    "parent": {
+        "type": "page_id",
+        "page_id": "59833787-2cf9-4fdf-8782-e53db20768a5"
+    },
+    "type": "bookmark",
+    "bookmark": {
+        "caption": [],
+        "url": "https://companywebsite.com"
+    }
+}
