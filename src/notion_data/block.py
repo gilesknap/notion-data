@@ -41,6 +41,9 @@ class _BlockCommon(Root):
     has_children: bool = False
     archived: bool = False
     in_trash: bool = False
+    request_id: str | None = Field(
+        default=None, description="The ID of the block", pattern=UUIDv4
+    )
 
     @model_validator(mode="before")
     # for child blocks, type is not required so insert it
@@ -200,10 +203,13 @@ class NumberedListItem(_BlockCommon):
 
 
 class Paragraph(_BlockCommon):
+    class _ParagraphData(Root):
+        rich_text: RichText
+        color: Color = Color.DEFAULT
+        children: list[_ChildBlockUnion] | None = None
+
     type: Literal["paragraph"]
-    paragraph: RichText
-    color: Color = Color.DEFAULT
-    children: list[_ChildBlockUnion] | None = None
+    paragraph: _ParagraphData
 
 
 class Quote(_BlockCommon):
