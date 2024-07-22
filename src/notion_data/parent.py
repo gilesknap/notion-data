@@ -4,7 +4,7 @@ Represents a parent object in Notion.
 https://developers.notion.com/reference/parent-object
 """
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import Field
 
