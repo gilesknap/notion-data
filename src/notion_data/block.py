@@ -12,6 +12,7 @@ from typing import Annotated, Literal, Union
 from pydantic import Field, RootModel
 
 from .enums import Color, Language
+from .file import FileObject
 from .identify import NotionUser
 from .parent import Parent
 from .regex import UUIDv4
@@ -100,6 +101,16 @@ class Code(_BlockCommon):
     code: _CodeData
 
 
+class ColumnList(_BlockCommon):
+    type: Literal["column_list"]
+    column_list: dict = {}
+
+
+class Column(_BlockCommon):
+    type: Literal["column"]
+    column: dict = {}
+
+
 class _HeadingData(Root):
     rich_text: RichText
     color: Color = Color.DEFAULT
@@ -109,6 +120,32 @@ class _HeadingData(Root):
 class Heading1(_BlockCommon):
     type: Literal["heading_1"]
     heading_1: _HeadingData
+
+
+class Divider(_BlockCommon):
+    type: Literal["divider"]
+    divider: dict = {}
+
+
+class Embed(_BlockCommon):
+    class _EmbedData(Root):
+        url: str
+
+    type: Literal["embed"]
+    embed: _EmbedData
+
+
+class Equation(_BlockCommon):
+    class _EquationData(Root):
+        expression: str
+
+    type: Literal["equation"]
+    equation: _EquationData
+
+
+class File(_BlockCommon):
+    type: Literal["file"]
+    file: FileObject
 
 
 class Heading2(_BlockCommon):

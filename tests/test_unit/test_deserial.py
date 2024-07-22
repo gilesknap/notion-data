@@ -64,3 +64,16 @@ def test_code(data_folder):
     assert block.root.object == "block"
     assert block.root.code.language == "javascript"
     assert block.root.code.rich_text[0].text.content == "const a = 3"
+
+
+def test_file(data_folder):
+    """
+    example: https://developers.notion.com/reference/block
+    """
+    p = data_folder / "file.json"
+    with p.open() as f:
+        data = json.load(f)
+
+    block = Block(**data)
+    assert block.root.object == "block"
+    assert block.root.file.external.url == "https://companywebsite.com/files/doc.txt"
