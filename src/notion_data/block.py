@@ -4,12 +4,18 @@ Represent the block data structure in the Notion API.
 https://developers.notion.com/reference/block
 """
 
+from __future__ import annotations
+
+from datetime import datetime
 from enum import Enum
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field
 
+from .identify import NotionUser
+from .parent import Parent
 from .regex import UUIDv4
+from .rich_text import RichText
 from .root import Root
 
 
@@ -47,18 +53,52 @@ class BlockType(Enum):
     VIDEO = "video"
 
 
-class Block(Root):
+class BlockCommon(Root):
     """A block in Notion"""
 
     object: Literal["block"]
     id: str = Field(description="The ID of the block", pattern=UUIDv4)
-    type: BlockType
-    has_children: bool
-    parent: dict
-    properties: dict
-    content: list
-    created_time: str
-    last_edited_time: str
-    archived: bool
-    created_by: dict
-    last_edited_by: dict
+    parent: Parent
+    created_time: datetime | None = None
+    last_edited_time: datetime | None = None
+    created_by: NotionUser | None = None
+    last_edited_by: NotionUser | None = None
+    has_children: bool = False
+    archived: bool = False
+    in_trash: bool = False
+
+
+class Heading2(BlockCommon):
+    class Heading2Data(Root):
+        rich_text: RichText
+        color: str = "default"
+        is_togglable: bool = False
+
+    type: Literal["heading_2"]
+    heading_2: Heading2Data
+
+
+class Paragraph(BlockCommon):
+    type: Literal["paragraph"]
+    paragraph: RichText
+    color: str = "default"
+    children: list[Block] | None = None
+
+
+class Todo(BlockCommon):
+    class TodoData(Root):
+        rich_text: RichText
+        checked: bool = False
+        color: str = "default"
+        children: list[Block]
+
+    type: Literal["to_do"]
+    to_do: TodoData
+
+
+""" Block is union of all block types, discriminated by type literal """
+# TODO iterate over the subclasses of BlockCommon instead of hardcoding them
+Block = Annotated[
+    Heading2 | Paragraph | Todo,
+    Field(discriminator="type", description="union of arg types"),
+]

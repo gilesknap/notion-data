@@ -16,14 +16,14 @@ class DatabaseParent(Root):
     """A database parent object in Notion"""
 
     type: Literal["database_id"]
-    id: str = Field(description="The ID of the database", pattern=UUIDv4)
+    database_id: str = Field(description="The ID of the database", pattern=UUIDv4)
 
 
 class PageParent(Root):
     """A page parent object in Notion"""
 
     type: Literal["page_id"]
-    id: str = Field(description="The ID of the page", pattern=UUIDv4)
+    page_id: str = Field(description="The ID of the page", pattern=UUIDv4)
 
 
 class WorkspaceParent(Root):
@@ -42,7 +42,7 @@ class BlockParent(Root):
 
 
 Parent = Annotated[  # type: ignore
-    Union[tuple(DatabaseParent, PageParent, WorkspaceParent, BlockParent)],
+    DatabaseParent | PageParent | WorkspaceParent | BlockParent,
     Field(discriminator="type", description="union of arg types"),
 ]
 """ Parent is union of all parent types, discriminated by `type` literal """
