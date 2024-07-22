@@ -239,6 +239,24 @@ class SyncedBlock(_BlockCommon):
     synced_block: _SyncedBlockData
 
 
+class Table(_BlockCommon):
+    class _TableData(Root):
+        table_width: int
+        has_column_header: bool
+        has_row_header: bool
+
+    type: Literal["table"]
+    table: _TableData
+
+
+class TableRow(_BlockCommon):
+    class _TableRowData(Root):
+        cells: list[RichText]
+
+    type: Literal["table_row"]
+    table_row: _TableRowData
+
+
 """ Block is union of all block types, discriminated by type literal """
 _BlockUnion = Annotated[
     Union[tuple(_BlockCommon.__subclasses__())],

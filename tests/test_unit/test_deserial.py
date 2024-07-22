@@ -110,3 +110,17 @@ def test_synced_to(data_folder):
         block.root.synced_block.children[0].callout.rich_text[0].text.content
         == "Callout in synced block"
     )
+
+
+def test_table(data_folder):
+    """
+    example: https://developers.notion.com/reference/block
+    """
+    p = data_folder / "table.json"
+    with p.open() as f:
+        data = json.load(f)
+
+    block = Block(**data)
+    assert block.root.table_row.cells[0][0].text.content == "column 1 content"
+    assert block.root.table_row.cells[1][0].text.content == "column 2 content"
+    assert block.root.table_row.cells[2][0].text.content == "column 3 content"
