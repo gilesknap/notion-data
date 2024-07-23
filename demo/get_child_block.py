@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from pprint import pprint
 
@@ -18,7 +17,7 @@ pprint(block_json)
 block = Block(**block_json)
 
 children_json = notion.blocks.children.list(block_id=config.get("block_id"))
-child2 = Block(**children_json["results"][1])
+child2 = Block(**children_json["results"][0])
 
 text = child2.root.paragraph.rich_text[0].text.content
 print(text)
