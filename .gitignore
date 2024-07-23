@@ -71,3 +71,4 @@ lockfiles/
 
 secret*
 **/.config.yaml
+.VSCodeCounter/

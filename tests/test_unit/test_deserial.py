@@ -4,6 +4,7 @@ our own objects.
 """
 
 import json
+from datetime import datetime
 
 from notion_data.block import Block
 from notion_data.page import Page
@@ -133,3 +134,14 @@ def test_page(data_folder):
     page = Page(**data)
     assert page.object == "page"
     assert page.id == "8e0d8f87-b513-486f-8a3c-ea085ce5c308"
+
+    p = data_folder / "page2.json"
+    with p.open() as f:
+        data = json.load(f)
+
+    page = Page(**data)
+    assert page.object == "page"
+    assert page.id == "be633bf1-dfa0-436d-b259-571129a590e5"
+    assert page.created_time == datetime.fromisoformat("2022-10-24T22:54:00.000Z")
+    assert page.properties["Title"].title[0].plain_text == "Bug bash"
+    assert page.created_by.id == "c2f20311-9e54-4d11-8c79-7398424ae41e"

@@ -9,9 +9,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, RootModel, model_validator
+from pydantic import Field
 
-from .enums import Color, Language
+from .enums import Color
 from .file import FileObject
 from .identify import NotionUser
 from .parent import Parent
@@ -19,14 +19,14 @@ from .regex import UUIDv4
 from .rich_text import RichText
 from .root import Root
 
+ID: Field = Field(default=None, description="Identifier", pattern=UUIDv4)
+
 
 class Page(Root):
     """A page in Notion"""
 
     object: Literal["page"] | None = None
-    id: str | None = Field(
-        default=None, description="The ID of the block", pattern=UUIDv4
-    )
+    id: str | None = ID
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
     created_by: NotionUser | None = None
@@ -37,9 +37,7 @@ class Page(Root):
     parent: Parent | None = None
     archived: bool = False
     in_trash: bool = False
-    request_id: str | None = Field(
-        default=None, description="The ID of the block", pattern=UUIDv4
-    )
+    request_id: str | None = ID
     properties: dict[str, _PropertyUnion]
     url: str | None = None
     public_url: str | None = None
@@ -54,20 +52,127 @@ class Icon(Root):
 class PageProperty(Root):
     # id and type are returned in get's but not required for post / patch
     id: str | None = None
+    # name is shown in the docs sometimes but is just a copy of the property key
+    name: str | None = None
 
 
-class Date(Root):
-    start: datetime
-    end: datetime | None = None
-    timezone: str | None = None
+class Checkbox(PageProperty):
+    type: Literal["checkbox"]
+    checkbox: bool
 
 
-class DueDate(PageProperty):
-    class _DueDateData(Root):
-        due_date: datetime
+class User(Root):
+    object: Literal["user"]
+    id: str = ID
+    name: str | None = None
+    avatar_url: str | None = None
+    type: str | None = None
+    bot: dict | None = None
 
-    type: Literal["due_date"]
-    date: _DueDateData
+
+class CreatedBy(PageProperty):
+    type: Literal["created_by"]
+    created_by: User
+
+
+class CreatedTime(PageProperty):
+    type: Literal["created_time"]
+    created_time: datetime
+
+
+class Date(PageProperty):
+    class _DateData(Root):
+        start: datetime
+        end: datetime | None = None
+        time_zone: str | None = None
+
+    type: Literal["date"]
+    date: _DateData
+
+
+class Email(PageProperty):
+    type: Literal["email"]
+    email: str
+
+
+class Files(PageProperty):
+    type: Literal["files"]
+    files: list[FileObject]
+
+
+class Formula(PageProperty):
+    type: Literal["formula"]
+    formula: FormulaBool | FormulaDate | FormulaNumber | FormulaString
+
+
+class FormulaBool(Root):
+    type: Literal["bool"]
+    formula: bool
+
+
+class FormulaDate(Root):
+    type: Literal["date"]
+    formula: datetime
+
+
+class FormulaNumber(Root):
+    type: Literal["number"]
+    formula: float | int
+
+
+class FormulaString(Root):
+    type: Literal["string"]
+    formula: str
+
+
+class LastEditedBy(PageProperty):
+    type: Literal["last_edited_by"]
+    last_edited_by: User
+
+
+class LastEditedTime(PageProperty):
+    type: Literal["last_edited_time"]
+    last_edited_time: datetime
+
+
+class MultiSelect(PageProperty):
+    class _MultiSelectData(Root):
+        color: Color = Color.DEFAULT
+        id: str = ID  # TODO the docs imply this may not be a UUID
+        # https://developers.notion.com/reference/page-property-values#example-multi_select-page-property-value-as-returned-in-a-get-page-request
+        name: str
+
+    type: Literal["multi_select"]
+    multi_select: list[_MultiSelectData]
+
+
+class Number(PageProperty):
+    type: Literal["number"]
+    number: float | int
+
+
+class People(PageProperty):
+    type: Literal["people"]
+    people: list[User]
+
+
+class Relation(PageProperty):
+    class _RelationData(Root):
+        id: str = ID
+
+    type: Literal["relation"]
+    has_more: bool | None = None
+    relation: list[_RelationData]
+
+
+class Status(PageProperty):
+    class _StatusData(Root):
+        id: str | None = ID
+        name: str
+        color: Color = Color.DEFAULT
+
+    type: Literal["status"]
+    status: _StatusData
 
 
 class Title(PageProperty):
@@ -76,6 +181,8 @@ class Title(PageProperty):
 
 
 _PropertyUnion: TypeAlias = Annotated[  # type: ignore
+    # TODO need to include RichText but that is a list and therefore not
+    # a Pydantic model - how to do this?
     Union[tuple(PageProperty.__subclasses__())],  # type: ignore
     Field(discriminator="type", description="union of block types"),
 ]
