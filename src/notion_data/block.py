@@ -27,12 +27,10 @@ class Block(RootModel):
 class _BlockCommon(Root):
     """A block in Notion"""
 
-    # child block objects do not require type
     object: Literal["block"] | None = None
     id: str | None = Field(
         default=None, description="The ID of the block", pattern=UUIDv4
     )
-    # child block objects do not require parent
     parent: Parent | None = None
     created_time: datetime | None = None
     last_edited_time: datetime | None = None

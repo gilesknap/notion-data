@@ -1,0 +1,58 @@
+{
+    "archived": false,
+    "cover": {
+        "external": {
+            "url": "https: //www.notion.so/images/page-cover/woodcuts_1.jpg"
+        },
+        "type": "external"
+    },
+    "created_by": {
+        "id": "cbb991ef-0db4-4c20-a298-ce5aad994d09",
+        "object": "user"
+    },
+    "created_time": "2024-07-22T20: 42: 00.000Z",
+    "icon": {
+        "emoji": "☀️",
+        "type": "emoji"
+    },
+    "id": "8e0d8f87-b513-486f-8a3c-ea085ce5c308",
+    "in_trash": false,
+    "last_edited_by": {
+        "id": "cbb991ef-0db4-4c20-a298-ce5aad994d09",
+        "object": "user"
+    },
+    "last_edited_time": "2024-07-23T17: 24: 00.000Z",
+    "object": "page",
+    "parent": {
+        "page_id": "20276f6f-26c3-40c5-8581-ad12cff73f8e",
+        "type": "page_id"
+    },
+    "properties": {
+        "title": {
+            "id": "title",
+            "title": [
+                {
+                    "annotations": {
+                        "bold": false,
+                        "code": false,
+                        "color": "default",
+                        "italic": false,
+                        "strikethrough": false,
+                        "underline": false
+                    },
+                    "href": null,
+                    "plain_text": "Pydantic Testing Page",
+                    "text": {
+                        "content": "Pydantic Testing Page",
+                        "link": null
+                    },
+                    "type": "text"
+                }
+            ],
+            "type": "title"
+        }
+    },
+    "public_url": null,
+    "request_id": "313af694-be40-44a1-99e3-156a7682fa98",
+    "url": "https: //www.notion.so/Pydantic-Testing-Page-8e0d8f87b513486f8a3cea085ce5c308"
+}

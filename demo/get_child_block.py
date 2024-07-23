@@ -21,3 +21,7 @@ child2 = Block(**children_json["results"][0])
 
 text = child2.root.paragraph.rich_text[0].text.content
 print(text)
+print()
+
+page_json = notion.pages.retrieve(page_id=config.get("page_id"))
+pprint(page_json)
