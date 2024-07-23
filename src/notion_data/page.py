@@ -20,7 +20,7 @@ from .rich_text import RichText
 from .root import Root
 
 
-class _PageCommon(Root):
+class Page(Root):
     """A page in Notion"""
 
     object: Literal["page"] | None = None
@@ -32,7 +32,7 @@ class _PageCommon(Root):
     created_by: NotionUser | None = None
     last_edited_by: NotionUser | None = None
     cover: FileObject | None = None
-    icon: FileObject | None = None
+    icon: Icon | None = None
     has_children: bool = False
     parent: Parent | None = None
     archived: bool = False
@@ -40,9 +40,15 @@ class _PageCommon(Root):
     request_id: str | None = Field(
         default=None, description="The ID of the block", pattern=UUIDv4
     )
-    properties: dict[PageProperty]
+    properties: dict[str, _PropertyUnion]
     url: str | None = None
     public_url: str | None = None
+
+
+class Icon(Root):
+    # TODO this needs to be a union of emoji and other things
+    type: Literal["emoji"]
+    emoji: str
 
 
 class PageProperty(Root):
@@ -50,25 +56,26 @@ class PageProperty(Root):
     id: str | None = None
 
 
+class Date(Root):
+    start: datetime
+    end: datetime | None = None
+    timezone: str | None = None
+
+
 class DueDate(PageProperty):
     class _DueDateData(Root):
         due_date: datetime
 
-    type: Literal["due_date"] = "due_date"
-    DueDate: _DueDateData
-
-
-class State(PageProperty):
-    class _StateData(Root):
-        select: Annotated[dict[str, str], Field(alias="select")]
-
-    type: Literal["state"] = "state"
-    State: _StateData
+    type: Literal["due_date"]
+    date: _DueDateData
 
 
 class Title(PageProperty):
-    class _TitleData(Root):
-        title: RichText
+    type: Literal["title"]
+    title: RichText
 
-    type: Literal["title"] = "title"
-    Title: _TitleData
+
+_PropertyUnion: TypeAlias = Annotated[  # type: ignore
+    Union[tuple(PageProperty.__subclasses__())],  # type: ignore
+    Field(discriminator="type", description="union of block types"),
+]

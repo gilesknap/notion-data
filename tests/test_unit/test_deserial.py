@@ -6,11 +6,7 @@ our own objects.
 import json
 
 from notion_data.block import Block
-from notion_data.root import Root
-
-
-class Page(Root):
-    block: Block
+from notion_data.page import Page
 
 
 def test_block(data_folder):
@@ -124,3 +120,16 @@ def test_table(data_folder):
     assert block.root.table_row.cells[0][0].text.content == "column 1 content"
     assert block.root.table_row.cells[1][0].text.content == "column 2 content"
     assert block.root.table_row.cells[2][0].text.content == "column 3 content"
+
+
+def test_page(data_folder):
+    """
+    example: https://developers.notion.com/reference/page
+    """
+    p = data_folder / "page1.json"
+    with p.open() as f:
+        data = json.load(f)
+
+    page = Page(**data)
+    assert page.object == "page"
+    assert page.id == "8e0d8f87-b513-486f-8a3c-ea085ce5c308"
