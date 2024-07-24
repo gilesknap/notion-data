@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field
+from pydantic import Field, RootModel
 
 from .enums import Color
 from .file import FileObject
@@ -19,28 +19,7 @@ from .regex import UUIDv4
 from .rich_text import RichText
 from .root import Root
 
-ID: Field = Field(default=None, description="Identifier", pattern=UUIDv4)
-
-
-class Page(Root):
-    """A page in Notion"""
-
-    object: Literal["page"] | None = None
-    id: str | None = ID
-    created_time: datetime | None = None
-    last_edited_time: datetime | None = None
-    created_by: NotionUser | None = None
-    last_edited_by: NotionUser | None = None
-    cover: FileObject | None = None
-    icon: Icon | None = None
-    has_children: bool = False
-    parent: Parent | None = None
-    archived: bool = False
-    in_trash: bool = False
-    request_id: str | None = ID
-    properties: dict[str, _PropertyUnion]
-    url: str | None = None
-    public_url: str | None = None
+ID: Field = Field(default=None, description="Identifier", pattern=UUIDv4)  # type: ignore
 
 
 class Icon(Root):
@@ -55,6 +34,14 @@ class PageProperty(Root):
     # name is shown in the docs sometimes but is just a copy of the property key
     name: str | None = None
 
+    # @model_validator(mode="before")
+    # # ensure the discriminator is present
+    # def insert_type(cls, values):
+    #     if "type" not in values:
+    #         # type is the first and only key in the dict
+    #         values["type"] = list(values)[0]
+    #     return values
+
 
 class Checkbox(PageProperty):
     type: Literal["checkbox"]
@@ -62,12 +49,16 @@ class Checkbox(PageProperty):
 
 
 class User(Root):
+    class _Person(Root):
+        email: str
+
     object: Literal["user"]
     id: str = ID
     name: str | None = None
     avatar_url: str | None = None
     type: str | None = None
     bot: dict | None = None
+    person: _Person | None = None
 
 
 class CreatedBy(PageProperty):
@@ -184,5 +175,41 @@ _PropertyUnion: TypeAlias = Annotated[  # type: ignore
     # TODO need to include RichText but that is a list and therefore not
     # a Pydantic model - how to do this?
     Union[tuple(PageProperty.__subclasses__())],  # type: ignore
-    Field(discriminator="type", description="union of block types"),
+    Field(description="union of block types"),
 ]
+
+PageProperties: TypeAlias = Annotated[
+    dict[str, _PropertyUnion], Field(description="dynamic page properties")
+]
+
+
+class _PageCommon(Root):
+    """A page in Notion"""
+
+    object: Literal["page"]
+    id: str | None = ID
+    created_time: datetime | None = None
+    last_edited_time: datetime | None = None
+    created_by: NotionUser | None = None
+    last_edited_by: NotionUser | None = None
+    cover: FileObject | None = None
+    icon: Icon | None = None
+    has_children: bool = False
+    parent: Parent | None = None
+    archived: bool = False
+    in_trash: bool = False
+    request_id: str | None = ID
+    properties: PageProperties
+    url: str | None = None
+    public_url: str | None = None
+
+    # @model_validator(mode="after")
+    # # because the property keys are dynamic, we need to convert them to a
+    # # model at validation time
+    # def make_properties(self) -> Self:
+    #     self.properties = dict_model_instance("PageProperties", self.properties)
+    #     return self
+
+
+class Page(RootModel):
+    root: _PageCommon

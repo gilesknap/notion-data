@@ -15,6 +15,11 @@ from .root import Root
 # TODO href should be typed ??
 
 
+class Url(Root):
+    type: Literal["url"] | None = None
+    url: str
+
+
 class BaseRichText(Root):
     """A base class for all rich text objects"""
 
@@ -26,7 +31,7 @@ class BaseRichText(Root):
 class TextObject(BaseRichText):
     class TextObjectData(Root):
         content: str
-        link: str | None = None
+        link: Url | None = None
 
     type: Literal["text"]
     text: TextObjectData

@@ -5,6 +5,7 @@ our own objects.
 
 import json
 from datetime import datetime
+from pprint import pprint
 
 from notion_data.block import Block
 from notion_data.page import Page
@@ -123,7 +124,7 @@ def test_table(data_folder):
     assert block.root.table_row.cells[2][0].text.content == "column 3 content"
 
 
-def test_page(data_folder):
+def test_page1(data_folder):
     """
     example: https://developers.notion.com/reference/page
     """
@@ -131,17 +132,21 @@ def test_page(data_folder):
     with p.open() as f:
         data = json.load(f)
 
+    pprint(data)
     page = Page(**data)
-    assert page.object == "page"
-    assert page.id == "8e0d8f87-b513-486f-8a3c-ea085ce5c308"
+    assert page.root.object == "page"
+    assert page.root.id == "8e0d8f87-b513-486f-8a3c-ea085ce5c308"
 
+
+def test_page2(data_folder):
     p = data_folder / "page2.json"
     with p.open() as f:
         data = json.load(f)
 
+    pprint(data)
     page = Page(**data)
-    assert page.object == "page"
-    assert page.id == "be633bf1-dfa0-436d-b259-571129a590e5"
-    assert page.created_time == datetime.fromisoformat("2022-10-24T22:54:00.000Z")
-    assert page.properties["Title"].title[0].plain_text == "Bug bash"
-    assert page.created_by.id == "c2f20311-9e54-4d11-8c79-7398424ae41e"
+    assert page.root.object == "page"
+    assert page.root.id == "be633bf1-dfa0-436d-b259-571129a590e5"
+    assert page.root.created_time == datetime.fromisoformat("2022-10-24T22:54:00.000Z")
+    assert page.root.properties["Title"].title[0].plain_text == "Bug bash"
+    assert page.root.created_by.id == "c2f20311-9e54-4d11-8c79-7398424ae41e"

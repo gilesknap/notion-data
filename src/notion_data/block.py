@@ -4,6 +4,10 @@ Represent the block data structure in the Notion API.
 https://developers.notion.com/reference/block
 """
 
+# TODO see here for some good tricks on how to do partial models for patching
+# etc. This would avoid all the | None stuff
+# https://github.com/pydantic/pydantic/issues/6381
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -16,7 +20,7 @@ from .file import FileObject
 from .identify import NotionUser
 from .parent import Parent
 from .regex import UUIDv4
-from .rich_text import RichText
+from .rich_text import RichText, Url
 from .root import Root
 
 
@@ -140,11 +144,8 @@ class Divider(_BlockCommon):
 
 
 class Embed(_BlockCommon):
-    class _EmbedData(Root):
-        url: str
-
     type: Literal["embed"]
-    embed: _EmbedData
+    embed: Url
 
 
 class Equation(_BlockCommon):
@@ -183,11 +184,8 @@ class LinkPreview(_BlockCommon):
     Cannot be created by the API, only returned in the context of a page.
     """
 
-    class _LinkPreviewData(Root):
-        url: str
-
     type: Literal["link_preview"]
-    link_to: _LinkPreviewData
+    link_to: Url
 
 
 class NumberedListItem(_BlockCommon):
