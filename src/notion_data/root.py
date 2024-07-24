@@ -18,13 +18,6 @@ class Root(BaseModel):
     """A Base class for setting consistent Pydantic model configuration"""
 
     model_config = ConfigDict(
-        extra="forbid", use_enum_values=True, json_encoders={datetime: _format_datetime}
-    )
-
-
-class PropertyRoot(Root):
-    """A Base class for setting Page Properties which have dynamic keys"""
-
-    model_config = ConfigDict(
-        extra="allow", use_enum_values=True, json_encoders={datetime: _format_datetime}
+        extra="forbid",
+        use_enum_values=True,
     )
