@@ -2,6 +2,7 @@ import os
 from pprint import pprint
 
 from notion_client import Client
+from pydantic import TypeAdapter
 
 from notion_data.dynamic import dict_model_instance
 from notion_data.page import Page
@@ -39,19 +40,14 @@ def test_plain_page():
 
     page = Page(**page_json)
 
-    parent = page.parent.model_dump()
-    rich_text = page.properties["title"].title[0].text
+    properties = dict_model_instance("props", page.properties)
+    rich_text = properties.title.title[0].text
     rich_text.content += " COPY. MADE by test_plain_page()"
-
-    properties = dict_model_instance("props", page.properties).model_dump()
-
-    pprint(properties)
-    pprint(parent)
 
     # make a copy of the page
     result = notion.pages.create(
-        parent=parent,
-        properties=properties,
+        parent=page.parent.model_dump(),
+        properties=properties.model_dump(),
     )
     # delete the page we just created
     new_page = Page(**result)

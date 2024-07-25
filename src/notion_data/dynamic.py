@@ -8,7 +8,7 @@ from .root import CONFIG
 
 def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
     """
-    Because database child pages have dynamic properties, we need to create
+    Because database child pages have dynamic property names, we need to create
     a model at runtime for them
     """
     fields = {}
