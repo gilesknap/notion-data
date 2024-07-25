@@ -26,11 +26,6 @@ def test_db_page():
     pprint(properties)
     pprint(page.parent.model_dump())
 
-    # TODO still really struggling with getting properties to work
-    # they have dynamic keys and so no model in code.
-    # I cna use dic_model_instance to create a model at runtime but then
-    # the below fails deserialising datetime
-
     # make a copy of the page
     # notion.pages.create(
     #     parent=page.root.parent.model_dump(),
@@ -43,9 +38,21 @@ def test_plain_page():
     pprint(page_json)
 
     page = Page(**page_json)
-    pprint(page.model_dump())
 
-    properties = page.properties
-    print()
+    parent = page.parent.model_dump()
+    rich_text = page.properties["title"].title[0].text
+    rich_text.content += " COPY. MADE by test_plain_page()"
+
+    properties = dict_model_instance("props", page.properties).model_dump()
+
     pprint(properties)
-    pprint(page.parent.model_dump())
+    pprint(parent)
+
+    # make a copy of the page
+    result = notion.pages.create(
+        parent=parent,
+        properties=properties,
+    )
+    # delete the page we just created
+    new_page = Page(**result)
+    notion.pages.update(page_id=new_page.id, archived=True)

@@ -32,7 +32,7 @@ class PageProperty(Root):
     # id and type are returned in get's but not required for post / patch
     id: str | None = None
     # name is shown in the docs sometimes but is just a copy of the property key
-    name: str | None = None
+    # name: str = ""
 
     # @model_validator(mode="before")
     # # ensure the discriminator is present
