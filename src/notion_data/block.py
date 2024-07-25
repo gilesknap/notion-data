@@ -48,7 +48,7 @@ class _BlockCommon(Root):
     # so that the discriminator is present
     def insert_type(cls, values):
         if "type" not in values:
-            # type is the first and only key in the dict
+            # type literal matches the first and only key in the dict
             values["type"] = list(values)[0]
         return values
 

@@ -179,7 +179,7 @@ _PropertyUnion: TypeAlias = Annotated[  # type: ignore
 ]
 
 
-class _PageCommon(Root):
+class Page(Root):
     """A page in Notion"""
 
     object: Literal["page"]
@@ -197,28 +197,5 @@ class _PageCommon(Root):
     request_id: str | None = ID
     url: str | None = None
     public_url: str | None = None
-
-
-class TitlePage(_PageCommon):
-    class _TitlePageData(Root):
-        Title: Title
-
-    properties: _TitlePageData
-
-
-class DatabasePage(_PageCommon):
+    # this is dynamic as the keys are the column names from parent database
     properties: dict[str, _PropertyUnion]
-    # @model_validator(mode="after")
-    # # because the property keys are dynamic, we need to convert them to a
-    # # model at validation time
-    # def make_properties(self) -> Self:
-    #     self.properties = dict_model_instance("PageProperties", self.properties)
-    #     return self
-
-
-_PageUnion: TypeAlias = Annotated[  # type: ignore
-    Union[tuple(_PageCommon.__subclasses__())],  # type: ignore
-    Field(description="union of page types"),
-]
-
-Page = TypeAdapter(_PageUnion)

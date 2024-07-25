@@ -108,6 +108,7 @@ def test_synced_to(data_folder):
         block.synced_block.children[0].callout.rich_text[0].text.content
         == "Callout in synced block"
     )
+    pprint(block.model_dump())
 
 
 def test_table(data_folder):
@@ -133,7 +134,7 @@ def test_page1(data_folder):
         data = json.load(f)
 
     pprint(data)
-    page = Page.validate_python(data)
+    page = Page(**data)
     assert page.object == "page"
     assert page.id == "8e0d8f87-b513-486f-8a3c-ea085ce5c308"
 
@@ -144,7 +145,7 @@ def test_page2(data_folder):
         data = json.load(f)
 
     pprint(data)
-    page = Page.validate_python(data)
+    page = Page(**data)
     assert page.object == "page"
     assert page.id == "be633bf1-dfa0-436d-b259-571129a590e5"
     assert page.created_time == datetime.fromisoformat("2022-10-24T22:54:00.000Z")
