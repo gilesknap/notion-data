@@ -13,7 +13,12 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, TypeAdapter, model_validator
+from pydantic import (
+    Field,
+    TypeAdapter,
+    field_serializer,
+    model_validator,
+)
 
 from .enums import Color, Language
 from .file import FileObject
@@ -21,7 +26,7 @@ from .identify import NotionUser
 from .parent import Parent
 from .regex import UUIDv4
 from .rich_text import RichText, Url
-from .root import Root
+from .root import Root, format_datetime
 
 
 class _BlockCommon(Root):
@@ -34,6 +39,7 @@ class _BlockCommon(Root):
     parent: Parent | None = None
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
+
     created_by: NotionUser | None = None
     last_edited_by: NotionUser | None = None
     has_children: bool = False
@@ -42,6 +48,10 @@ class _BlockCommon(Root):
     request_id: str | None = Field(
         default=None, description="The ID of the block", pattern=UUIDv4
     )
+
+    @field_serializer("last_edited_time", "created_time")
+    def validate_time(self, time: datetime, _info):
+        return format_datetime(time)
 
     @model_validator(mode="before")
     # for child blocks, type is not required so insert it

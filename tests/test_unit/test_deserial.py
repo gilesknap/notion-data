@@ -22,6 +22,7 @@ def test_block(data_folder):
     block = Block.validate_python(data)
     assert block.object == "block"
     assert block.heading_2.rich_text[0].plain_text == "Lacinato kale"
+    pprint(block.model_dump())
 
 
 def test_bookmark(data_folder):

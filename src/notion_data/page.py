@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, TypeAdapter
+from pydantic import Field, field_serializer
 
 from .enums import Color
 from .file import FileObject
@@ -17,7 +17,7 @@ from .identify import NotionUser
 from .parent import Parent
 from .regex import UUIDv4
 from .rich_text import RichText
-from .root import Root
+from .root import Root, format_datetime
 
 ID: Field = Field(default=None, description="Identifier", pattern=UUIDv4)  # type: ignore
 
@@ -199,3 +199,7 @@ class Page(Root):
     public_url: str | None = None
     # this is dynamic as the keys are the column names from parent database
     properties: dict[str, _PropertyUnion]
+
+    @field_serializer("last_edited_time", "created_time")
+    def validate_time(self, time: datetime, _info):
+        return format_datetime(time)

@@ -3,6 +3,8 @@ from typing import Annotated
 from pydantic import BaseModel, create_model
 from pydantic.fields import FieldInfo
 
+from .root import CONFIG
+
 
 def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
     """
@@ -12,5 +14,5 @@ def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
     fields = {}
     for field_name, value in dict_def.items():
         fields[field_name] = Annotated[type(value), FieldInfo(description=field_name)]
-    model = create_model(name, **fields)  # type: ignore
+    model = create_model(name, **fields, model_config=CONFIG)  # type: ignore
     return model(**dict_def)
