@@ -2,7 +2,6 @@ import os
 from pprint import pprint
 
 from notion_client import Client
-from pydantic import TypeAdapter
 
 from notion_data.dynamic import dict_model_instance
 from notion_data.page import Page
