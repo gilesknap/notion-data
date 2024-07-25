@@ -2,6 +2,7 @@ import os
 from pprint import pprint
 
 from notion_client import Client
+from pydantic import TypeAdapter
 
 from notion_data.dynamic import dict_model_instance
 from notion_data.page import Page
@@ -20,7 +21,8 @@ def test_db_page():
     page = Page(**page_json)
     pprint(page.model_dump())
 
-    properties = page.properties
+    pprint(page.properties)
+    properties = dict_model_instance("props", page.properties).model_dump()
     print()
     pprint(properties)
     pprint(page.parent.model_dump())
