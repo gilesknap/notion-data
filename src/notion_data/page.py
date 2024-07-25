@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, RootModel
+from pydantic import Field, TypeAdapter
 
 from .enums import Color
 from .file import FileObject
@@ -178,10 +178,6 @@ _PropertyUnion: TypeAlias = Annotated[  # type: ignore
     Field(description="union of block types"),
 ]
 
-PageProperties: TypeAlias = Annotated[
-    dict[str, _PropertyUnion], Field(description="dynamic page properties")
-]
-
 
 class _PageCommon(Root):
     """A page in Notion"""
@@ -199,10 +195,19 @@ class _PageCommon(Root):
     archived: bool = False
     in_trash: bool = False
     request_id: str | None = ID
-    properties: PageProperties
     url: str | None = None
     public_url: str | None = None
 
+
+class TitlePage(_PageCommon):
+    class _TitlePageData(Root):
+        Title: Title
+
+    properties: _TitlePageData
+
+
+class DatabasePage(_PageCommon):
+    properties: dict[str, _PropertyUnion]
     # @model_validator(mode="after")
     # # because the property keys are dynamic, we need to convert them to a
     # # model at validation time
@@ -211,5 +216,9 @@ class _PageCommon(Root):
     #     return self
 
 
-class Page(RootModel):
-    root: _PageCommon
+_PageUnion: TypeAlias = Annotated[  # type: ignore
+    Union[tuple(_PageCommon.__subclasses__())],  # type: ignore
+    Field(description="union of page types"),
+]
+
+Page = TypeAdapter(_PageUnion)

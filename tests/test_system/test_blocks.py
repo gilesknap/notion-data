@@ -12,8 +12,7 @@ notion = Client(auth=secret)
 def test_get_paragraph():
     block_json = notion.blocks.retrieve(block_id=block_id)
 
-    block = Block(block_json)
-    assert (
-        block.root.paragraph.rich_text[0].text.content == "Interesting block with url "
-    )
-    assert block.root.paragraph.rich_text[1].text.link.url == "http://www.google.com/"
+    block = Block.validate_python(block_json)
+
+    assert block.paragraph.rich_text[0].text.content == "Interesting block with url "
+    assert block.paragraph.rich_text[1].text.link.url == "http://www.google.com/"

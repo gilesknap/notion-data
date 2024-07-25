@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, RootModel, model_validator
+from pydantic import Field, TypeAdapter, model_validator
 
 from .enums import Color, Language
 from .file import FileObject
@@ -22,10 +22,6 @@ from .parent import Parent
 from .regex import UUIDv4
 from .rich_text import RichText, Url
 from .root import Root
-
-
-class Block(RootModel):
-    root: _BlockUnion
 
 
 class _BlockCommon(Root):
@@ -295,3 +291,5 @@ _ChildBlockUnion: TypeAlias = Annotated[  # type: ignore
     Union[tuple(_BlockCommon.__subclasses__())],  # type: ignore
     Field(description="union of block types"),
 ]
+
+Block = TypeAdapter(_BlockUnion)

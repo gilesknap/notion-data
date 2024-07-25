@@ -16,13 +16,13 @@ def test_db_page():
     page_json = notion.pages.retrieve(page_id=database_child_page_id)
     pprint(page_json)
 
-    page = Page(page_json)
+    page = Page.validate_python(page_json)
     pprint(page.model_dump())
 
-    properties = dict_model_instance("PageProperties", page.root.properties)
+    properties = page.properties
     print()
-    pprint(properties.model_dump())
-    pprint(page.root.parent.model_dump())
+    pprint(properties)
+    pprint(page.parent.model_dump())
 
     # TODO still really struggling with getting properties to work
     # they have dynamic keys and so no model in code.
