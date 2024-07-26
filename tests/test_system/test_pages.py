@@ -19,21 +19,19 @@ def test_db_page():
     pprint(page_json)
 
     page = Page(**page_json)
-    properties = page.model_dump()["properties"]
-    pprint(page.model_dump_json())
-    del properties["Created time"]
-    del properties["Created by"]
-    page.properties = None
+    properties = page.properties
+    del properties.Created_time
+    del properties.Created_by
 
     # make a copy of the page
     result = notion.pages.create(
         parent=page.parent.model_dump(),
-        properties=properties,
+        properties=properties.model_dump(),
     )
 
     # delete the page we just created
     new_page = Page(**result)
-    notion.pages.update(page_id=new_page.id, archived=True)
+    # notion.pages.update(page_id=new_page.id, archived=True)
 
 
 def test_plain_page():

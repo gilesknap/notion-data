@@ -11,8 +11,15 @@ def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
     Because database child pages have dynamic property names, we need to create
     a model at runtime for them
     """
-    fields = {}
-    for field_name, value in dict_def.items():
-        fields[field_name] = Annotated[type(value), FieldInfo(description=field_name)]
+    # replace spaces as they make illegal field names - but really we need more
+    # robust handling of this
+    new_dict = {key.replace(" ", "_"): val for key, val in dict_def.items()}
+    fields = {
+        key.replace(" ", "_"): Annotated[
+            type(value), FieldInfo(description=key, alias=key.replace("_", " "))
+        ]
+        for key, value in new_dict.items()
+    }
+
     model = create_model(name, **fields, model_config=CONFIG)  # type: ignore
-    return model(**dict_def)
+    return model(**new_dict)

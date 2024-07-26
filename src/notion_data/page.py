@@ -204,9 +204,6 @@ class Page(Root):
     def validate_time(self, time: datetime, _info):
         return format_datetime(time)
 
-    @field_serializer("properties")
-    def validate_properties(self, properties, _info):
-        result = {}
-        for key, value in properties.items():
-            result[key] = value.model_dump()
-        return result
+    @field_validator("properties", mode="after")
+    def validate_properties(cls, properties, _info):
+        return dict_model_instance("properties", properties)
