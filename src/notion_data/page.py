@@ -61,12 +61,20 @@ class CreatedTime(PageProperty):
     type: Literal["created_time"]
     created_time: datetime
 
+    @field_serializer("created_time")
+    def validate_time(self, time: datetime, _info):
+        return format_datetime(time)
+
 
 class Date(PageProperty):
     class _DateData(Root):
         start: datetime
         end: datetime | None = None
         time_zone: str | None = None
+
+        @field_serializer("start", "end")
+        def validate_time(self, time: datetime, _info):
+            return format_datetime(time)
 
     type: Literal["date"]
     date: _DateData
@@ -196,7 +204,9 @@ class Page(Root):
     def validate_time(self, time: datetime, _info):
         return format_datetime(time)
 
-    @field_validator("properties", mode="after")
-    def validate_properties(cls, properties, _info):
-        # properties dictionary is dynamic - generate the model instance here
-        return dict_model_instance("Properties", properties)
+    @field_serializer("properties")
+    def validate_properties(self, properties, _info):
+        result = {}
+        for key, value in properties.items():
+            result[key] = value.model_dump()
+        return result
