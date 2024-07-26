@@ -9,8 +9,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, field_serializer
+from pydantic import Field, TypeAdapter, field_serializer, field_validator
 
+from .dynamic import dict_model_instance
 from .enums import Color
 from .file import FileObject
 from .identify import NotionUser
@@ -31,16 +32,6 @@ class Icon(Root):
 class PageProperty(Root):
     # id and type are returned in get's but not required for post / patch
     id: str | None = None
-    # name is shown in the docs sometimes but is just a copy of the property key
-    # name: str = ""
-
-    # @model_validator(mode="before")
-    # # ensure the discriminator is present
-    # def insert_type(cls, values):
-    #     if "type" not in values:
-    #         # type is the first and only key in the dict
-    #         values["type"] = list(values)[0]
-    #     return values
 
 
 class Checkbox(PageProperty):
@@ -166,7 +157,7 @@ class Status(PageProperty):
     status: _StatusData
 
 
-class Title(PageProperty):
+class TitleClass(PageProperty):
     type: Literal["title"]
     title: RichText
 
@@ -197,9 +188,15 @@ class Page(Root):
     request_id: str | None = ID
     url: str | None = None
     public_url: str | None = None
-    # this is dynamic as the keys are the column names from parent database
+    # Properties' keys are the column names from parent database
+    # Therefore dynamic - model is created by validate_properties below
     properties: dict[str, _PropertyUnion]
 
     @field_serializer("last_edited_time", "created_time")
     def validate_time(self, time: datetime, _info):
         return format_datetime(time)
+
+    @field_validator("properties", mode="after")
+    def validate_properties(cls, properties, _info):
+        # properties dictionary is dynamic - generate the model instance here
+        return dict_model_instance("Properties", properties)

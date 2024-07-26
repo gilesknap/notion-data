@@ -150,5 +150,5 @@ def test_page2(data_folder):
     assert page.object == "page"
     assert page.id == "be633bf1-dfa0-436d-b259-571129a590e5"
     assert page.created_time == datetime.fromisoformat("2022-10-24T22:54:00.000Z")
-    assert page.properties["Title"].title[0].plain_text == "Bug bash"
+    assert page.properties.Title.title[0].plain_text == "Bug bash"
     assert page.created_by.id == "c2f20311-9e54-4d11-8c79-7398424ae41e"

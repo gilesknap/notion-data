@@ -22,9 +22,6 @@ def test_db_page():
     pprint(page.model_dump())
 
     pprint(page.properties)
-    properties = dict_model_instance("props", page.properties).model_dump()
-    print()
-    pprint(properties)
     pprint(page.parent.model_dump())
 
     # make a copy of the page
@@ -40,14 +37,14 @@ def test_plain_page():
 
     page = Page(**page_json)
 
-    properties = dict_model_instance("props", page.properties)
-    rich_text = properties.title.title[0].text
+    # properties = dict_model_instance("props", page.properties)
+    rich_text = page.properties.title.title[0].text
     rich_text.content += " COPY. MADE by test_plain_page()"
 
     # make a copy of the page
     result = notion.pages.create(
         parent=page.parent.model_dump(),
-        properties=properties.model_dump(),
+        properties=page.properties.model_dump(),
     )
     # delete the page we just created
     new_page = Page(**result)
