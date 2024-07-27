@@ -66,7 +66,7 @@ class _BlockCommon(Root):
 class Bookmark(_BlockCommon):
     class _BookmarkData(Root):
         url: str
-        caption: RichText
+        caption: list[RichText]
 
     type: Literal["bookmark"]
     bookmark: _BookmarkData
@@ -79,17 +79,17 @@ class BreadCrumb(_BlockCommon):
 
 class BulletedListItem(_BlockCommon):
     class _BulletedData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         color: Color = Color.DEFAULT
         children: list[_ChildBlockUnion] | None = None
 
     type: Literal["bulleted_list_item"]
-    bulleted_list_item: RichText
+    bulleted_list_item: list[RichText]
 
 
 class Callout(_BlockCommon):
     class _CalloutData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         icon: str | None = None
         color: Color = Color.DEFAULT
 
@@ -115,8 +115,8 @@ class ChildPage(_BlockCommon):
 
 class Code(_BlockCommon):
     class _CodeData(Root):
-        caption: RichText
-        rich_text: RichText
+        caption: list[RichText]
+        rich_text: list[RichText]
         language: Language
 
     type: Literal["code"]
@@ -134,7 +134,7 @@ class Column(_BlockCommon):
 
 
 class _HeadingData(Root):
-    rich_text: RichText
+    rich_text: list[RichText]
     color: Color = Color.DEFAULT
     is_toggleable: bool = False
 
@@ -196,7 +196,7 @@ class LinkPreview(_BlockCommon):
 
 class NumberedListItem(_BlockCommon):
     class _NumberedListItemData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         color: Color = Color.DEFAULT
         children: list[_ChildBlockUnion] | None = None
 
@@ -206,7 +206,7 @@ class NumberedListItem(_BlockCommon):
 
 class Paragraph(_BlockCommon):
     class _ParagraphData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         color: Color = Color.DEFAULT
         children: list[_ChildBlockUnion] | None = None
 
@@ -216,7 +216,7 @@ class Paragraph(_BlockCommon):
 
 class Quote(_BlockCommon):
     class _QuoteData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         color: Color = Color.DEFAULT
         children: list[_ChildBlockUnion] | None = None
 
@@ -248,7 +248,7 @@ class Table(_BlockCommon):
 
 class TableRow(_BlockCommon):
     class _TableRowData(Root):
-        cells: list[RichText]
+        cells: list[list[RichText]]
 
     type: Literal["table_row"]
     table_row: _TableRowData
@@ -256,7 +256,7 @@ class TableRow(_BlockCommon):
 
 class Todo(_BlockCommon):
     class TodoData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         checked: bool = False
         color: Color = Color.DEFAULT
         children: list[_ChildBlockUnion] | None = None
@@ -267,7 +267,7 @@ class Todo(_BlockCommon):
 
 class Toggle(_BlockCommon):
     class _ToggleData(Root):
-        rich_text: RichText
+        rich_text: list[RichText]
         color: Color = Color.DEFAULT
         children: list[_ChildBlockUnion] | None = None
 

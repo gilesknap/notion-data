@@ -14,7 +14,7 @@ from .root import Root
 
 
 class _FileCommon(Root):
-    caption: RichText | None = None
+    caption: list[RichText] | None = None
     name: str | None = None
 
 

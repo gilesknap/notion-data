@@ -167,11 +167,11 @@ class Status(PageProperty):
 
 class TitleClass(PageProperty):
     type: Literal["title"] = "title"
-    title: RichText
+    title: list[RichText]
 
 
 _PropertyUnion: TypeAlias = Annotated[  # type: ignore
-    # TODO need to include RichText but that is a list and therefore not
+    # TODO need to include list[RichText] but that is a list and therefore not
     # a Pydantic model - how to do this?
     Union[tuple(PageProperty.__subclasses__())],  # type: ignore
     Field(description="union of block types"),
