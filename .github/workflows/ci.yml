@@ -32,6 +32,7 @@ jobs:
       runs-on: ${{ matrix.runs-on }}
       python-version: ${{ matrix.python-version }}
     secrets:
+      NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   dist:
