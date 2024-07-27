@@ -7,13 +7,13 @@ https://developers.notion.com/reference/page
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Literal, TypeAlias, Union
+from typing import Annotated, Literal, Sequence, TypeAlias, Union
 
 from pydantic import Field, field_serializer, field_validator
 
 from .dynamic import dict_model_instance
 from .enums import Color
-from .file import _FileUnion
+from .file import FileUnion
 from .identify import NotionUser
 from .parent import _ParentUnion
 from .regex import UUIDv4
@@ -87,7 +87,7 @@ class Email(PageProperty):
 
 class Files(PageProperty):
     type: Literal["files"] = "files"
-    files: list[_FileUnion]
+    files: list[FileUnion]
 
 
 class Formula(PageProperty):
@@ -167,10 +167,10 @@ class Status(PageProperty):
 
 class TitleClass(PageProperty):
     type: Literal["title"] = "title"
-    title: list[RichText]
+    title: Sequence[RichText]
 
 
-_PropertyUnion: TypeAlias = Annotated[  # type: ignore
+PropertyUnion: TypeAlias = Annotated[  # type: ignore
     # TODO need to include list[RichText] but that is a list and therefore not
     # a Pydantic model - how to do this?
     Union[tuple(PageProperty.__subclasses__())],  # type: ignore
@@ -187,7 +187,7 @@ class Page(Root):
     last_edited_time: datetime | None = None
     created_by: NotionUser | None = None
     last_edited_by: NotionUser | None = None
-    cover: _FileUnion | None = None
+    cover: FileUnion | None = None
     icon: Icon | None = None
     has_children: bool = False
     parent: _ParentUnion | None = None
@@ -198,7 +198,7 @@ class Page(Root):
     public_url: str | None = None
     # Properties' keys are the column names from parent database
     # Therefore dynamic - model is created by validate_properties below
-    properties: dict[str, _PropertyUnion] | Root
+    properties: dict[str, PropertyUnion]
 
     @field_serializer("last_edited_time", "created_time")
     def validate_time(self, time: datetime, _info):

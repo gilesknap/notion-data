@@ -16,14 +16,12 @@ def format_datetime(date: datetime) -> str:
     return date.isoformat()
 
 
-CONFIG = ConfigDict(
-    extra="forbid",
-    use_enum_values=True,
-    ser_json_timedelta="iso8601",
-)
-
-
 class Root(BaseModel):
     """A Base class for setting consistent Pydantic model configuration"""
 
-    model_config = CONFIG
+    model_config = ConfigDict(
+        extra="forbid",
+        use_enum_values=True,
+        ser_json_timedelta="iso8601",
+        populate_by_name=True,
+    )

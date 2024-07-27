@@ -9,13 +9,16 @@ from typing import Annotated, Literal, TypeAlias, Union
 
 from pydantic import Field
 
-from .rich_text import RichText
 from .root import Root
 
 
 class _FileCommon(Root):
-    caption: list[RichText] | None = None
-    name: str | None = None
+    pass
+
+    # TODO restore these once we get exclude_unset=True working into FileUnion
+
+    # caption: list[RichText] | None = None
+    # name: str | None = None
 
 
 class FileUrl(_FileCommon):
@@ -46,7 +49,7 @@ class PDF(_FileCommon):
     pdf: FileExternal
 
 
-_FileUnion: TypeAlias = Annotated[  # type: ignore
+FileUnion: TypeAlias = Annotated[  # type: ignore
     Union[tuple(_FileCommon.__subclasses__())],  # type: ignore
     Field(discriminator="type", description="union of arg types"),
 ]

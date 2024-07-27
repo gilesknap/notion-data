@@ -41,7 +41,7 @@ def test_plain_page(client, ids):
     # make a copy of the page
     result = client.pages.create(
         parent=page.parent.model_dump(),
-        properties=page.properties.model_dump(),
+        properties=page.properties.model_dump(by_alias=True),
     )
     # delete the page we just created
     new_page = Page(**result)

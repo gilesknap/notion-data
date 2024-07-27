@@ -21,7 +21,7 @@ from pydantic import (
 )
 
 from .enums import Color, Language
-from .file import _FileUnion
+from .file import FileUnion
 from .identify import NotionUser
 from .parent import _ParentUnion
 from .regex import UUIDv4
@@ -164,7 +164,7 @@ class Equation(_BlockCommon):
 
 class File(_BlockCommon):
     type: Literal["file"]
-    file: _FileUnion
+    file: FileUnion
 
 
 class Heading2(_BlockCommon):
@@ -179,7 +179,7 @@ class Heading3(_BlockCommon):
 
 class Image(_BlockCommon):
     class _ImageData(Root):
-        file: _FileUnion
+        file: FileUnion
 
     type: Literal["image"]
     image: _ImageData
@@ -277,7 +277,7 @@ class Toggle(_BlockCommon):
 
 class Video(_BlockCommon):
     class _VideoData(Root):
-        file: _FileUnion
+        file: FileUnion
 
     type: Literal["video"]
     video: _VideoData
