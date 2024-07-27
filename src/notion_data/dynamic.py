@@ -3,7 +3,7 @@ from typing import Annotated
 from pydantic import BaseModel, create_model
 from pydantic.fields import Field
 
-from .root import CONFIG
+from .root import Root
 
 
 def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
@@ -25,6 +25,6 @@ def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
         for key, value in aliased_dict.items()
     }
 
-    model: BaseModel = create_model(name, **fields, model_config=CONFIG)
+    model = create_model(name, **fields, __base__=Root)  # type: ignore
     instance = model(**dict_def)
     return instance
