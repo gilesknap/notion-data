@@ -13,5 +13,5 @@ from .root import Root
 class NotionUser(Root):
     """A Notion user object"""
 
-    object: Literal["user"]
+    object: Literal["user"] = "user"
     id: str = Field(description="The ID of the user", pattern=UUIDv4)
