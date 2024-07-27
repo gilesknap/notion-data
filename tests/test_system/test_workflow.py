@@ -19,8 +19,17 @@ def test_make_page(client, ids):
         icon=Icon(type="emoji", emoji="🚀"),
         has_children=False,
         parent=(PageParent(page_id=ids.plain_page_id)),
-        properties={"Title": TitleClass(title=[TextObject()])},
+        properties={"title": TitleClass(title=[TextObject("Generated Test Page")])},
     )
 
     assert page.icon.emoji == "🚀"
     assert not page.has_children
+
+    result = client.pages.create(
+        parent=page.parent.model_dump(exclude_unset=True),
+        properties=page.properties.model_dump(exclude_unset=True),
+    )
+
+    # delete the page we just created
+    new_page = Page(**result)
+    # client.pages.update(page_id=new_page.id, in_trash=True)

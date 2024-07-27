@@ -29,12 +29,19 @@ class _BaseRichText(Root):
 
 
 class TextObject(_BaseRichText):
-    class TextObjectData(Root):
+    def __init__(self, text, **data) -> None:
+        if isinstance(text, str):
+            data["text"] = self._TextObjectData(content=text, link=data.get("link"))
+        else:
+            data["text"] = text
+        super().__init__(**data)
+
+    class _TextObjectData(Root):
         content: str = ""
         link: Url | None = None
 
     type: Literal["text"] = "text"
-    text: TextObjectData = TextObjectData()
+    text: _TextObjectData
 
 
 class Mention(_BaseRichText):
