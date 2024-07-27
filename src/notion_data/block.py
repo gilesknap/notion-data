@@ -57,6 +57,10 @@ class _BlockCommon(Root):
     # for child blocks, type is not required so insert it
     # so that the discriminator is present
     def insert_type(cls, values):
+        # TODO not sure why but the Children TypeAdapter gets validated here
+        # use check for list to skip over it for now ...
+        if isinstance(values, list):
+            return values
         if "type" not in values:
             # type literal matches the first and only key in the dict
             values["type"] = list(values)[0]
@@ -303,3 +307,4 @@ _ChildBlockUnion: TypeAlias = Annotated[  # type: ignore
 ]
 
 Block = TypeAdapter(_BlockUnion)
+Children = TypeAdapter(list[_ChildBlockUnion])
