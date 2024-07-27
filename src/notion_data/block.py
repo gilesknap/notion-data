@@ -21,9 +21,9 @@ from pydantic import (
 )
 
 from .enums import Color, Language
-from .file import FileObject
+from .file import _FileUnion
 from .identify import NotionUser
-from .parent import Parent
+from .parent import _ParentUnion
 from .regex import UUIDv4
 from .rich_text import RichText, Url
 from .root import Root, format_datetime
@@ -36,7 +36,7 @@ class _BlockCommon(Root):
     id: str | None = Field(
         default=None, description="The ID of the block", pattern=UUIDv4
     )
-    parent: Parent | None = None
+    parent: _ParentUnion | None = None
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
 
@@ -164,7 +164,7 @@ class Equation(_BlockCommon):
 
 class File(_BlockCommon):
     type: Literal["file"]
-    file: FileObject
+    file: _FileUnion
 
 
 class Heading2(_BlockCommon):
@@ -179,7 +179,7 @@ class Heading3(_BlockCommon):
 
 class Image(_BlockCommon):
     class _ImageData(Root):
-        file: FileObject
+        file: _FileUnion
 
     type: Literal["image"]
     image: _ImageData
@@ -277,7 +277,7 @@ class Toggle(_BlockCommon):
 
 class Video(_BlockCommon):
     class _VideoData(Root):
-        file: FileObject
+        file: _FileUnion
 
     type: Literal["video"]
     video: _VideoData

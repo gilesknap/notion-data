@@ -25,7 +25,7 @@ class FileUrl(_FileCommon):
         url: str
         expiry_time: datetime
 
-    type: Literal["file"]
+    type: Literal["file"] = "file"
     file: _FileData
 
 
@@ -35,18 +35,18 @@ class FileExternal(_FileCommon):
     class _FileExternalData(Root):
         url: str
 
-    type: Literal["external"]
+    type: Literal["external"] = "external"
     external: _FileExternalData
 
 
 class PDF(_FileCommon):
     """A PDF file object in Notion"""
 
-    type: Literal["pdf"]
+    type: Literal["pdf"] = "pdf"
     pdf: FileExternal
 
 
-FileObject: TypeAlias = Annotated[  # type: ignore
+_FileUnion: TypeAlias = Annotated[  # type: ignore
     Union[tuple(_FileCommon.__subclasses__())],  # type: ignore
     Field(discriminator="type", description="union of arg types"),
 ]
