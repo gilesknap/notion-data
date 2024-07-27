@@ -198,7 +198,7 @@ class Page(Root):
     public_url: str | None = None
     # Properties' keys are the column names from parent database
     # Therefore dynamic - model is created by validate_properties below
-    properties: dict[str, _PropertyUnion]
+    properties: dict[str, _PropertyUnion] | Root
 
     @field_serializer("last_edited_time", "created_time")
     def validate_time(self, time: datetime, _info):

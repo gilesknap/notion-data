@@ -26,7 +26,7 @@ def test_db_page():
     # make a copy of the page
     result = notion.pages.create(
         parent=page.parent.model_dump(),
-        properties=properties.model_dump(),
+        properties=properties.model_dump(by_alias=True),
     )
 
     # delete the page we just created
