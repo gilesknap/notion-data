@@ -182,7 +182,7 @@ class Page(Root):
     """A page in Notion"""
 
     object: Literal["page"] = "page"
-    id: str | None = ID
+    id: str = ID
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
     created_by: NotionUser | None = None
@@ -190,7 +190,7 @@ class Page(Root):
     cover: FileUnion | None = None
     icon: Icon | None = None
     has_children: bool = False
-    parent: _ParentUnion | None = None
+    parent: _ParentUnion
     archived: bool = False
     in_trash: bool = False
     request_id: str | None = ID
