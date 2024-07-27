@@ -9,6 +9,7 @@ from typing import Sequence
 from .file import FileExternal, FileUnion, FileUrl
 from .page import PropertyUnion, TitleClass
 from .rich_text import RichText, TextObject, Url
+from .root import unset_none
 
 
 def add_properties(
@@ -55,12 +56,9 @@ def file(
     """
     if expiry_time is None:
         ext_data = FileExternal._FileExternalData(url=url)
-        # TODO
-        # file = FileExternal(external=data, name=name, caption=caption)
-        return FileExternal(external=ext_data)
+        ext_file = FileExternal(external=ext_data, name=name, caption=caption)
+        unset_none(ext_file)
+        return ext_file
     else:
         data = FileUrl._FileData(url=url, expiry_time=expiry_time)
-        # TODO
-        # data = FileUrl._FileData(url=url, expiry_time=expiry_time, name=name,
-        #   caption=caption)
-        return FileUrl(file=data)
+        return FileUrl(file=data, name=name, caption=caption)
