@@ -4,7 +4,7 @@ Represents a parent object in Notion.
 https://developers.notion.com/reference/parent-object
 """
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeAlias
 
 from pydantic import Field
 
@@ -41,7 +41,7 @@ class BlockParent(Root):
     block: bool = True
 
 
-Parent = Annotated[  # type: ignore
+Parent: TypeAlias = Annotated[  # type: ignore
     DatabaseParent | PageParent | WorkspaceParent | BlockParent,
     Field(discriminator="type", description="union of arg types"),
 ]

@@ -68,3 +68,7 @@ lockfiles/
 
 # ruff cache
 .ruff_cache/
+
+secret*
+**/.config.yaml
+.VSCodeCounter/

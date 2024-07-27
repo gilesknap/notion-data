@@ -4,50 +4,61 @@ Represent the block data structure in the Notion API.
 https://developers.notion.com/reference/block
 """
 
+# TODO see here for some good tricks on how to do partial models for patching
+# etc. This would avoid all the | None stuff
+# https://github.com/pydantic/pydantic/issues/6381
+
 from __future__ import annotations
 
 from datetime import datetime
 from typing import Annotated, Literal, TypeAlias, Union
 
-from pydantic import Field, RootModel, model_validator
+from pydantic import (
+    Field,
+    TypeAdapter,
+    field_serializer,
+    model_validator,
+)
 
 from .enums import Color, Language
 from .file import FileObject
 from .identify import NotionUser
 from .parent import Parent
 from .regex import UUIDv4
-from .rich_text import RichText
-from .root import Root
-
-
-class Block(RootModel):
-    root: _BlockUnion
+from .rich_text import RichText, Url
+from .root import Root, format_datetime
 
 
 class _BlockCommon(Root):
     """A block in Notion"""
 
-    # child block objects do not require type
     object: Literal["block"] | None = None
     id: str | None = Field(
         default=None, description="The ID of the block", pattern=UUIDv4
     )
-    # child block objects do not require parent
     parent: Parent | None = None
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
+
     created_by: NotionUser | None = None
     last_edited_by: NotionUser | None = None
     has_children: bool = False
     archived: bool = False
     in_trash: bool = False
+    request_id: str | None = Field(
+        default=None, description="The ID of the block", pattern=UUIDv4
+    )
+
+    @field_serializer("last_edited_time", "created_time")
+    def validate_time(self, time: datetime, _info):
+        return format_datetime(time)
 
     @model_validator(mode="before")
     # for child blocks, type is not required so insert it
     # so that the discriminator is present
     def insert_type(cls, values):
         if "type" not in values:
-            # type is the first and only key in the dict
+            # type literal matches the first and only key in the dict
             values["type"] = list(values)[0]
         return values
 
@@ -139,11 +150,8 @@ class Divider(_BlockCommon):
 
 
 class Embed(_BlockCommon):
-    class _EmbedData(Root):
-        url: str
-
     type: Literal["embed"]
-    embed: _EmbedData
+    embed: Url
 
 
 class Equation(_BlockCommon):
@@ -182,11 +190,8 @@ class LinkPreview(_BlockCommon):
     Cannot be created by the API, only returned in the context of a page.
     """
 
-    class _LinkPreviewData(Root):
-        url: str
-
     type: Literal["link_preview"]
-    link_to: _LinkPreviewData
+    link_to: Url
 
 
 class NumberedListItem(_BlockCommon):
@@ -200,10 +205,13 @@ class NumberedListItem(_BlockCommon):
 
 
 class Paragraph(_BlockCommon):
+    class _ParagraphData(Root):
+        rich_text: RichText
+        color: Color = Color.DEFAULT
+        children: list[_ChildBlockUnion] | None = None
+
     type: Literal["paragraph"]
-    paragraph: RichText
-    color: Color = Color.DEFAULT
-    children: list[_ChildBlockUnion] | None = None
+    paragraph: _ParagraphData
 
 
 class Quote(_BlockCommon):
@@ -293,3 +301,5 @@ _ChildBlockUnion: TypeAlias = Annotated[  # type: ignore
     Union[tuple(_BlockCommon.__subclasses__())],  # type: ignore
     Field(description="union of block types"),
 ]
+
+Block = TypeAdapter(_BlockUnion)
