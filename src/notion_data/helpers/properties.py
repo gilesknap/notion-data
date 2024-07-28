@@ -4,10 +4,10 @@ Functions to help with creation of more complex properties types
 
 from datetime import datetime
 
-from ..file import FileExternal, FileUnion, FileUrl
 from ..page import PropertyUnion, TitleClass
-from ..rich_text import RichText, RichTextList, TextObject, Url
-from ..root import unset_none
+from ..types.file import FileExternal, FileUnion, FileUrl
+from ..types.model import unset_none
+from ..types.rich_text import RichText, RichTextList, TextObject, Url
 
 
 def add_properties(

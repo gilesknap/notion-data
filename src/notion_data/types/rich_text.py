@@ -10,10 +10,14 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from .root import Root
-from .simple import Url
+from .model import Root
 
 # TODO href should be typed ??
+
+
+class Url(Root):
+    type: Literal["url"] | None = None
+    url: str
 
 
 class _BaseRichText(Root):

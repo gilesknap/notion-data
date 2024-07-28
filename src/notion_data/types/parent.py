@@ -8,8 +8,8 @@ from typing import Annotated, Literal, TypeAlias
 
 from pydantic import Field
 
+from .model import Root
 from .regex import ID
-from .root import Root
 
 
 class DatabaseParent(Root):

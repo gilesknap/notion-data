@@ -1,4 +1,4 @@
-from .block import _BlockCommon
+from ..block import _BlockCommon
 
 
 class Mention(_BlockCommon):

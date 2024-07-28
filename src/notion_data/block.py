@@ -22,17 +22,15 @@ from pydantic import (
     RootModel,
     TypeAdapter,
     field_serializer,
-    model_validator,
 )
 
-from .enums import Color, Language
-from .file import FileUnion
-from .identify import NotionUser
-from .parent import _ParentUnion
-from .regex import ID
-from .rich_text import RichText
-from .root import Root, format_datetime
-from .simple import Icon, Url
+from .types.enums import Color, Language
+from .types.file import FileUnion
+from .types.model import Root, format_datetime
+from .types.parent import _ParentUnion
+from .types.regex import ID
+from .types.rich_text import RichText, Url
+from .types.simple import HeadingData, Icon, NotionUser
 
 
 class _BlockCommon(Root):
@@ -54,20 +52,6 @@ class _BlockCommon(Root):
     @field_serializer("last_edited_time", "created_time")
     def validate_time(self, time: datetime, _info):
         return format_datetime(time)
-
-    @model_validator(mode="before")
-    # for child blocks, type is not required so insert it
-    # so that the discriminator is present
-    def insert_type(cls, values):
-        return values
-        # # TODO not sure why but the Children TypeAdapter gets validated here
-        # # use check for list to skip over it for now ...
-        # if isinstance(values, list):
-        #     return values
-        # if "type" not in values:
-        #     # type literal matches the first and only key in the dict
-        #     values["type"] = list(values)[0]
-        # return values
 
 
 class Bookmark(_BlockCommon):
@@ -140,15 +124,9 @@ class Column(_BlockCommon):
     column: dict = {}
 
 
-class _HeadingData(Root):
-    rich_text: list[RichText]
-    color: Color = Color.DEFAULT
-    is_toggleable: bool = False
-
-
 class Heading1(_BlockCommon):
     type: Literal["heading_1"]
-    heading_1: _HeadingData
+    heading_1: HeadingData
 
 
 class Divider(_BlockCommon):
@@ -176,12 +154,12 @@ class FileBlock(_BlockCommon):
 
 class Heading2(_BlockCommon):
     type: Literal["heading_2"]
-    heading_2: _HeadingData
+    heading_2: HeadingData
 
 
 class Heading3(_BlockCommon):
     type: Literal["heading_3"]
-    heading_3: _HeadingData
+    heading_3: HeadingData
 
 
 class Image(_BlockCommon):

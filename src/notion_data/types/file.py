@@ -9,8 +9,8 @@ from typing import Annotated, Literal, TypeAlias, Union
 
 from pydantic import Field
 
-from .rich_text import RichText
-from .root import Root
+from ..types.rich_text import RichText
+from .model import Root
 
 
 class _FileCommon(Root):

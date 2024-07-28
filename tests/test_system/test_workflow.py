@@ -8,9 +8,9 @@ from pprint import pprint
 from notion_data.block import Blocks, BlocksList
 from notion_data.helpers.blocks import paragraph
 from notion_data.helpers.properties import add_properties, file, rich_text, title
-from notion_data.identify import NotionUser
 from notion_data.page import Icon, Page
-from notion_data.parent import PageParent
+from notion_data.types.parent import PageParent
+from notion_data.types.simple import NotionUser
 
 
 def test_make_page(client, ids):

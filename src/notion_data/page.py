@@ -11,38 +11,30 @@ from typing import Annotated, Literal, Sequence, TypeAlias, Union
 
 from pydantic import Field, field_serializer, field_validator
 
-from .dynamic import dict_model_instance
-from .enums import Color
-from .file import FileUnion
-from .identify import NotionUser
-from .parent import _ParentUnion
-from .regex import ID
-from .rich_text import RichText
-from .root import Root, format_datetime
-from .simple import Icon
+from .types.enums import Color
+from .types.file import FileUnion
+from .types.model import Root, dict_model_instance, format_datetime
+from .types.parent import _ParentUnion
+from .types.regex import ID
+from .types.rich_text import RichText
+from .types.simple import (
+    FormulaBool,
+    FormulaDate,
+    FormulaNumber,
+    FormulaString,
+    Icon,
+    NotionUser,
+    User,
+)
 
 
 class PageProperty(Root):
-    # id and type are returned in get's but not required for post / patch
     id: str | None = None
 
 
 class Checkbox(PageProperty):
     type: Literal["checkbox"] = "checkbox"
     checkbox: bool
-
-
-class User(Root):
-    class _Person(Root):
-        email: str
-
-    object: Literal["user"] = "user"
-    id: str = ID
-    name: str | None = None
-    avatar_url: str | None = None
-    type: str | None = None
-    bot: dict | None = None
-    person: _Person | None = None
 
 
 class CreatedBy(PageProperty):
@@ -86,26 +78,6 @@ class Files(PageProperty):
 class Formula(PageProperty):
     type: Literal["formula"] = "formula"
     formula: FormulaBool | FormulaDate | FormulaNumber | FormulaString
-
-
-class FormulaBool(Root):
-    type: Literal["bool"] = "bool"
-    formula: bool
-
-
-class FormulaDate(Root):
-    type: Literal["date"] = "date"
-    formula: datetime
-
-
-class FormulaNumber(Root):
-    type: Literal["number"] = "number"
-    formula: float | int
-
-
-class FormulaString(Root):
-    type: Literal["string"] = "string"
-    formula: str
 
 
 class LastEditedBy(PageProperty):
