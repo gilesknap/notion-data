@@ -62,7 +62,7 @@ def test_make_page_blocks(client, ids):
     result = client.pages.create(
         **page.model_dump(exclude_unset=True, by_alias=True),
     )
-    new_page = Page(**result)
+    new_page = Page.model_validate(result)
 
     # add the child blocks to the page
     result = client.blocks.children.append(
@@ -82,7 +82,7 @@ def test_get_page_blocks(client, ids):
     # get the blocks of a page
     new_page_result = client.blocks.children.list(block_id=ids.plain_page_id)
     pprint(new_page_result)
-    blocks = Blocks(**new_page_result)
+    blocks = Blocks.model_validate(new_page_result)
     pprint(blocks.model_dump())
 
     new_page = Page(
@@ -102,7 +102,7 @@ def test_get_page_blocks(client, ids):
 
     # fetch the child blocks of the page we are copying
     blocks_result = client.blocks.children.list(block_id=ids.plain_page_id)
-    blocks = Blocks(**blocks_result)
+    blocks = Blocks.model_validate(blocks_result)
     new_blocks = BlocksList(blocks.results)
 
     # add the children to the page
