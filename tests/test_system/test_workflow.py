@@ -13,6 +13,7 @@ from notion_data.parent import PageParent
 
 
 def test_make_page(client, ids):
+    # create a new page object
     page = Page(
         last_edited_time=datetime.now(),
         last_edited_by=NotionUser(id=ids.user_id),
@@ -23,6 +24,7 @@ def test_make_page(client, ids):
         properties=add_properties(title=title("Generated Test Page")),
     )
 
+    # create the page on the notion server
     result = client.pages.create(
         **page.model_dump(exclude_unset=True, by_alias=True),
     )
@@ -36,7 +38,7 @@ def test_make_page(client, ids):
     )
 
     # delete the page we just created
-    client.pages.update(page_id=new_page.id, in_trash=True)
+    client.pages.update(page_id=new_page.id, archived=True)
 
 
 def test_make_page_blocks(client, ids):
@@ -72,14 +74,14 @@ def test_make_page_blocks(client, ids):
     blocks = Blocks(**result)
 
     # delete the page we just created
-    client.pages.update(page_id=new_page.id, in_trash=True)
+    client.pages.update(page_id=new_page.id, archived=True)
 
 
 def test_get_page_blocks(client, ids):
     # get the blocks of a page
-    result = client.blocks.children.list(block_id=ids.plain_page_id)
-    pprint(result)
-    blocks = Blocks(**result)
+    new_page_result = client.blocks.children.list(block_id=ids.plain_page_id)
+    pprint(new_page_result)
+    blocks = Blocks(**new_page_result)
     pprint(blocks.model_dump())
 
     new_page = Page(
@@ -92,10 +94,10 @@ def test_get_page_blocks(client, ids):
     )
 
     # create the initial page
-    result = client.pages.create(
+    new_page_result = client.pages.create(
         **new_page.model_dump(exclude_unset=True, by_alias=True),
     )
-    new_page_result = Page(**result)
+    new_page_result = Page(**new_page_result)
 
     # fetch the child blocks of the page we are copying
     blocks_result = client.blocks.children.list(block_id=ids.plain_page_id)
@@ -103,7 +105,10 @@ def test_get_page_blocks(client, ids):
     new_blocks = BlocksList(blocks.results)
 
     # add the children to the page
-    result = client.blocks.children.append(
+    _new_blocks_result = client.blocks.children.append(
         children=new_blocks.model_dump(exclude_unset=True, by_alias=True),
         block_id=new_page_result.id,
     )
+
+    # delete the page we just created
+    client.pages.update(page_id=new_page_result.id, archived=True)

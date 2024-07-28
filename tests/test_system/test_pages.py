@@ -28,7 +28,7 @@ def test_db_page(client: Client, ids):
 
     # delete the page we just created
     new_page = Page(**result)  # type: ignore
-    client.pages.update(page_id=new_page.id, in_trash=True)
+    client.pages.update(page_id=new_page.id, archived=True)
 
 
 def test_plain_page(client, ids):
@@ -47,4 +47,4 @@ def test_plain_page(client, ids):
     )
     # delete the page we just created
     new_page = Page(**result)
-    client.pages.update(page_id=new_page.id, in_trash=True)
+    client.pages.update(page_id=new_page.id, archived=True)
