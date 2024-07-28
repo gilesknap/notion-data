@@ -1,16 +1,13 @@
 """
-These functions simplify the creation of the more complex data structures used
-in the Notion API.
+Functions to help with creation of more complex properties types
 """
 
 from datetime import datetime
 
-from .block import BlockUnion, Paragraph
-from .enums import Color
-from .file import FileExternal, FileUnion, FileUrl
-from .page import PropertyUnion, TitleClass
-from .rich_text import RichText, RichTextList, TextObject, Url
-from .root import unset_none
+from ..file import FileExternal, FileUnion, FileUrl
+from ..page import PropertyUnion, TitleClass
+from ..rich_text import RichText, RichTextList, TextObject, Url
+from ..root import unset_none
 
 
 def add_properties(
@@ -63,16 +60,3 @@ def file(
     else:
         data = FileUrl._FileData(url=url, expiry_time=expiry_time)
         return FileUrl(file=data, name=name, caption=caption)
-
-
-def paragraph(
-    rich_text: RichTextList,
-    color: Color = Color.DEFAULT,
-    children: list[BlockUnion] | None = None,
-) -> Paragraph:
-    """
-    Create a paragraph object for a page property.
-    """
-    data = Paragraph._ParagraphData(rich_text=rich_text, color=color, children=children)
-    unset_none(data)
-    return Paragraph(paragraph=data)

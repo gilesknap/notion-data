@@ -30,9 +30,9 @@ from .file import FileUnion
 from .identify import NotionUser
 from .parent import _ParentUnion
 from .regex import ID
-from .rich_text import RichText, Url
+from .rich_text import RichText
 from .root import Root, format_datetime
-from .simple import Icon
+from .simple import Icon, Url
 
 
 class _BlockCommon(Root):
@@ -169,7 +169,7 @@ class Equation(_BlockCommon):
     equation: _EquationData
 
 
-class File(_BlockCommon):
+class FileBlock(_BlockCommon):
     type: Literal["file"]
     file: FileUnion
 

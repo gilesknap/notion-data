@@ -11,3 +11,8 @@ class Icon(Root):
     # TODO this needs to be a union of emoji and other things
     type: Literal["emoji"] = "emoji"
     emoji: str
+
+
+class Url(Root):
+    type: Literal["url"] | None = None
+    url: str
