@@ -5,7 +5,7 @@ Helper functions for preparting data for API requests.
 from pydantic import BaseModel
 
 
-def encode_object(obj: BaseModel) -> dict:
+def encode(obj: BaseModel) -> dict:
     """
     Encode a Python object into a format that the Notion API can understand.
     """

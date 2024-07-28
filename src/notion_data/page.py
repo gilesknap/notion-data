@@ -7,7 +7,7 @@ https://developers.notion.com/reference/page
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Literal, Sequence, TypeAlias, Union
+from typing import Annotated, Literal, TypeAlias, Union
 
 from pydantic import Field, field_serializer, field_validator
 
@@ -16,7 +16,7 @@ from .types.file import FileUnion
 from .types.model import Root, dict_model_instance, format_datetime
 from .types.parent import _ParentUnion
 from .types.regex import ID
-from .types.rich_text import RichText
+from .types.rich_text import RichTextList
 from .types.simple import (
     FormulaBool,
     FormulaDate,
@@ -132,7 +132,7 @@ class Status(PageProperty):
 
 class TitleClass(PageProperty):
     type: Literal["title"] = "title"
-    title: Sequence[RichText]
+    title: RichTextList
 
 
 PropertyUnion: TypeAlias = Annotated[  # type: ignore

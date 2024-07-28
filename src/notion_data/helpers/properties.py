@@ -26,21 +26,35 @@ def add_properties(
     return properties
 
 
-def rich_text(text: str, link: str | None = None) -> RichTextList:
+def rich_text_list(text: str, link: str | None = None) -> RichTextList:
     """
-    Create a rich text object for a page property.
+    Create a rich text property (list of TextObject).
     """
     url = Url(url=link) if link else None
     data = TextObject._TextObjectData(content=text, link=url)
     return RichTextList([TextObject(text=data)])
 
 
+def get_text_object(rich_text: RichTextList, n=0) -> TextObject:
+    """
+    Get the rich text object from a rich text property.
+    """
+    return rich_text[n]
+
+
+def set_rich_text(rich_text: RichTextList, item: RichText, n=0) -> None:
+    """
+    Update the rich text object in a rich text property.
+    """
+    rich_text[n].text = item
+
+
 def title(text: str, link: str | None = None) -> TitleClass:
     """
-    Create a textual title object for a page property.
+    Create a title property.
     """
-    rich = rich_text(text, link)
-    return TitleClass(title=rich)
+    title = TitleClass(title=rich_text_list(text, link))
+    return title
 
 
 def file(

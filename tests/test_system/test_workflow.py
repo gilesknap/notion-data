@@ -6,8 +6,9 @@ from datetime import datetime
 from pprint import pprint
 
 from notion_data.block import Blocks, BlocksList
+from notion_data.helpers.api import encode
 from notion_data.helpers.blocks import paragraph
-from notion_data.helpers.properties import add_properties, file, rich_text, title
+from notion_data.helpers.properties import add_properties, file, rich_text_list, title
 from notion_data.page import Icon, Page
 from notion_data.types.parent import PageParent
 from notion_data.types.simple import NotionUser
@@ -26,26 +27,21 @@ def test_make_page(client, ids):
     )
 
     # create the page on the notion server
-    result = client.pages.create(
-        **page.model_dump(exclude_unset=True, by_alias=True),
-    )
-    new_page = Page(**result)
+    result = client.pages.create(**encode(page))
+    new_page = Page.model_validate(result)
 
-    pprint(new_page.model_dump())
     # example of updating a fetched page
     new_page.icon.emoji = "🌟"
-    client.pages.update(
-        page_id=new_page.id, **new_page.model_dump(exclude_unset=True, by_alias=True)
-    )
+    client.pages.update(page_id=new_page.id, **encode(new_page))
 
     # delete the page we just created
     client.pages.update(page_id=new_page.id, archived=True)
 
 
 def test_make_page_blocks(client, ids):
-    p1 = paragraph(rich_text=rich_text("This is a rich text object"))
-    p2 = paragraph(rich_text=rich_text("This is another rich text object"))
-    p3 = paragraph(rich_text=rich_text("This is a third rich text object"))
+    p1 = paragraph(rich_text=rich_text_list("This is a rich text object"))
+    p2 = paragraph(rich_text=rich_text_list("This is another rich text object"))
+    p3 = paragraph(rich_text=rich_text_list("This is a third rich text object"))
 
     blocks = BlocksList([p1, p2, p3])
 
@@ -58,24 +54,19 @@ def test_make_page_blocks(client, ids):
         properties=add_properties(title=title("Generated Test Page with Blocks")),
     )
 
-    # create the initial page
-    result = client.pages.create(
-        **page.model_dump(exclude_unset=True, by_alias=True),
-    )
-    new_page = Page.model_validate(result)
+    # create the page on the notion server
+    result = client.pages.create(**encode(page))
+    new_pg = Page.model_validate(result)
 
     # add the child blocks to the page
-    result = client.blocks.children.append(
-        children=blocks.model_dump(exclude_unset=True, by_alias=True),
-        block_id=new_page.id,
-    )
+    result = client.blocks.children.append(children=encode(blocks), block_id=new_pg.id)
 
     # fetch the child blocks from the page
-    result = client.blocks.children.list(block_id=new_page.id)
-    blocks = Blocks(**result)
+    result = client.blocks.children.list(block_id=new_pg.id)
+    blocks = Blocks.model_validate(result)
 
     # delete the page we just created
-    client.pages.update(page_id=new_page.id, archived=True)
+    client.pages.update(page_id=new_pg.id, archived=True)
 
 
 def test_get_page_blocks(client, ids):
