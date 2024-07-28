@@ -16,11 +16,9 @@ from .enums import Color
 from .file import FileUnion
 from .identify import NotionUser
 from .parent import _ParentUnion
-from .regex import UUIDv4
+from .regex import ID
 from .rich_text import RichText
 from .root import Root, format_datetime
-
-ID: Field = Field(default=None, description="Identifier", pattern=UUIDv4)  # type: ignore
 
 
 class Icon(Root):
@@ -198,6 +196,7 @@ class Page(Root):
     public_url: str | None = None
     # Properties' keys are the column names from parent database
     # Therefore dynamic - model is created by validate_properties below
+    # TODO: model this as title: TitleClass | dynamic properties
     properties: dict[str, PropertyUnion]
 
     @field_serializer("last_edited_time", "created_time")

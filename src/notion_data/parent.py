@@ -8,7 +8,7 @@ from typing import Annotated, Literal, TypeAlias
 
 from pydantic import Field
 
-from .regex import UUIDv4
+from .regex import ID
 from .root import Root
 
 
@@ -16,14 +16,14 @@ class DatabaseParent(Root):
     """A database parent object in Notion"""
 
     type: Literal["database_id"] = "database_id"
-    database_id: str = Field(description="The ID of the database", pattern=UUIDv4)
+    database_id: str = ID
 
 
 class PageParent(Root):
     """A page parent object in Notion"""
 
     type: Literal["page_id"] = "page_id"
-    page_id: str = Field(description="The ID of the page", pattern=UUIDv4)
+    page_id: str = ID
 
 
 class WorkspaceParent(Root):
@@ -37,7 +37,7 @@ class BlockParent(Root):
     """A block parent object in Notion"""
 
     type: Literal["block_id"] = "block_id"
-    id: str = Field(description="The ID of the block", pattern=UUIDv4)
+    id: str = ID
     block: bool = True
 
 

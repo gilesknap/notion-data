@@ -15,6 +15,7 @@ from typing import Annotated, Literal, TypeAlias, Union
 
 from pydantic import (
     Field,
+    RootModel,
     TypeAdapter,
     field_serializer,
     model_validator,
@@ -24,7 +25,7 @@ from .enums import Color, Language
 from .file import FileUnion
 from .identify import NotionUser
 from .parent import _ParentUnion
-from .regex import UUIDv4
+from .regex import ID
 from .rich_text import RichText, Url
 from .root import Root, format_datetime
 
@@ -33,9 +34,7 @@ class _BlockCommon(Root):
     """A block in Notion"""
 
     object: Literal["block"] | None = None
-    id: str | None = Field(
-        default=None, description="The ID of the block", pattern=UUIDv4
-    )
+    id: str | None = ID
     parent: _ParentUnion | None = None
     created_time: datetime | None = None
     last_edited_time: datetime | None = None
@@ -45,9 +44,7 @@ class _BlockCommon(Root):
     has_children: bool = False
     archived: bool = False
     in_trash: bool = False
-    request_id: str | None = Field(
-        default=None, description="The ID of the block", pattern=UUIDv4
-    )
+    request_id: str | None = ID
 
     @field_serializer("last_edited_time", "created_time")
     def validate_time(self, time: datetime, _info):
@@ -57,14 +54,15 @@ class _BlockCommon(Root):
     # for child blocks, type is not required so insert it
     # so that the discriminator is present
     def insert_type(cls, values):
-        # TODO not sure why but the Children TypeAdapter gets validated here
-        # use check for list to skip over it for now ...
-        if isinstance(values, list):
-            return values
-        if "type" not in values:
-            # type literal matches the first and only key in the dict
-            values["type"] = list(values)[0]
         return values
+        # # TODO not sure why but the Children TypeAdapter gets validated here
+        # # use check for list to skip over it for now ...
+        # if isinstance(values, list):
+        #     return values
+        # if "type" not in values:
+        #     # type literal matches the first and only key in the dict
+        #     values["type"] = list(values)[0]
+        # return values
 
 
 class Bookmark(_BlockCommon):
@@ -85,7 +83,7 @@ class BulletedListItem(_BlockCommon):
     class _BulletedData(Root):
         rich_text: list[RichText]
         color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
     type: Literal["bulleted_list_item"]
     bulleted_list_item: list[RichText]
@@ -202,7 +200,7 @@ class NumberedListItem(_BlockCommon):
     class _NumberedListItemData(Root):
         rich_text: list[RichText]
         color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
     type: Literal["numbered_list_item"]
     numbered_list_item: _NumberedListItemData
@@ -212,9 +210,9 @@ class Paragraph(_BlockCommon):
     class _ParagraphData(Root):
         rich_text: list[RichText]
         color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
-    type: Literal["paragraph"]
+    type: Literal["paragraph"] = "paragraph"
     paragraph: _ParagraphData
 
 
@@ -222,7 +220,7 @@ class Quote(_BlockCommon):
     class _QuoteData(Root):
         rich_text: list[RichText]
         color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
     type: Literal["quote"]
     quote: _QuoteData
@@ -231,10 +229,10 @@ class Quote(_BlockCommon):
 class SyncedBlock(_BlockCommon):
     class _SyncedBlockData(Root):
         class _SyncedFrom(Root):
-            block_id: str = Field(description="The ID of the block", pattern=UUIDv4)
+            block_id: str = ID
 
         synced_from: _SyncedFrom | None
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
     type: Literal["synced_block"]
     synced_block: _SyncedBlockData
@@ -263,7 +261,7 @@ class Todo(_BlockCommon):
         rich_text: list[RichText]
         checked: bool = False
         color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
     type: Literal["to_do"]
     to_do: TodoData
@@ -273,7 +271,7 @@ class Toggle(_BlockCommon):
     class _ToggleData(Root):
         rich_text: list[RichText]
         color: Color = Color.DEFAULT
-        children: list[_ChildBlockUnion] | None = None
+        children: list[BlockUnion] | None = None
 
     type: Literal["toggle"]
     toggle: _ToggleData
@@ -288,23 +286,28 @@ class Video(_BlockCommon):
 
 
 """ Block is union of all block types, discriminated by type literal """
-_BlockUnion: TypeAlias = Annotated[  # type: ignore
+BlockUnion: TypeAlias = Annotated[  # type: ignore
     Union[tuple(_BlockCommon.__subclasses__())],  # type: ignore
     Field(discriminator="type", description="union of block types"),
 ]
 
-""" ChildBlocks do not have type so can't use it as a discriminator.
-    In the model validator for these we insert the type so that
-    Pytdantic can resolve the subclass of the Union - just not as easilty as
-    with the discriminator.
 
-    (unfortunately discriminators are applied before the model validator
-    so we can't use type here even though the validator is adding it)
-"""
-_ChildBlockUnion: TypeAlias = Annotated[  # type: ignore
-    Union[tuple(_BlockCommon.__subclasses__())],  # type: ignore
-    Field(description="union of block types"),
-]
+Block = TypeAdapter(BlockUnion)
 
-Block = TypeAdapter(_BlockUnion)
-Children = TypeAdapter(list[_ChildBlockUnion])
+
+class Blocks(Root):
+    """A list of blocks in Notion returned by api call blocks.children.list"""
+
+    object: Literal["list"] = "list"
+    type: Literal["block"] = "block"
+    results: list[BlockUnion]
+    next_cursor: str | None = None
+    request_id: str = ID
+    block: BlockUnion | dict = {}
+    has_more: bool = False
+
+
+class BlocksList(RootModel):
+    """A list of blocks to pass to api call blocks.children.append"""
+
+    root: list[BlockUnion]

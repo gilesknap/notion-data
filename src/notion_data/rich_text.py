@@ -60,3 +60,8 @@ RichText = Annotated[
     TextObject | Mention | Equation,
     Field(discriminator="type", description="union of rich text types"),
 ]
+
+RichTextList = Annotated[
+    list[RichText],
+    Field(discriminator="type", description="list of rich text types"),
+]
