@@ -1,12 +1,12 @@
 from typing import Annotated
 
-from pydantic import BaseModel, create_model
+from pydantic import create_model
 from pydantic.fields import Field
 
 from .root import Root
 
 
-def dict_model_instance(name: str, dict_def: dict) -> BaseModel:
+def dict_model_instance(name: str, dict_def: dict) -> Root:
     """
     Because database child pages have dynamic property names, we need to create
     a model at runtime for them

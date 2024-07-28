@@ -9,6 +9,7 @@
         "synced_from": null,
         "children": [
             {
+                "type": "callout",
                 "callout": {
                     "rich_text": [
                         {

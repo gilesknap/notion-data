@@ -20,7 +20,7 @@ class Url(Root):
     url: str
 
 
-class BaseRichText(Root):
+class _BaseRichText(Root):
     """A base class for all rich text objects"""
 
     annotations: Annotations | None = None
@@ -28,22 +28,22 @@ class BaseRichText(Root):
     href: str | None = None
 
 
-class TextObject(BaseRichText):
-    class TextObjectData(Root):
-        content: str
+class TextObject(_BaseRichText):
+    class _TextObjectData(Root):
+        content: str = ""
         link: Url | None = None
 
-    type: Literal["text"]
-    text: TextObjectData
+    type: Literal["text"] = "text"
+    text: _TextObjectData
 
 
-class Mention(BaseRichText):
-    type: Literal["mention"]
+class Mention(_BaseRichText):
+    type: Literal["mention"] = "mention"
     mention: list  # TODO
 
 
-class Equation(BaseRichText):
-    type: Literal["equation"]
+class Equation(_BaseRichText):
+    type: Literal["equation"] = "equation"
     equation: dict  # TODO
 
 
@@ -56,9 +56,12 @@ class Annotations(Root):
     color: str = "default"
 
 
-RichTextUnion = Annotated[
+RichText = Annotated[
     TextObject | Mention | Equation,
     Field(discriminator="type", description="union of rich text types"),
 ]
 
-RichText = list[RichTextUnion]
+RichTextList = Annotated[
+    list[RichText],
+    Field(discriminator="type", description="list of rich text types"),
+]
