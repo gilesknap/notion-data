@@ -19,12 +19,7 @@ from .parent import _ParentUnion
 from .regex import ID
 from .rich_text import RichText
 from .root import Root, format_datetime
-
-
-class Icon(Root):
-    # TODO this needs to be a union of emoji and other things
-    type: Literal["emoji"] = "emoji"
-    emoji: str
+from .simple import Icon
 
 
 class PageProperty(Root):

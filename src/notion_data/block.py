@@ -8,6 +8,10 @@ https://developers.notion.com/reference/block
 # etc. This would avoid all the | None stuff
 # https://github.com/pydantic/pydantic/issues/6381
 
+# TODO: important: we need to consolodate the use of TypeAdapter, RootModel,
+# at present I seem to have ended up with a mix of approaches to dealing with
+# Unions, list and dict[str, Union] types.
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -28,6 +32,7 @@ from .parent import _ParentUnion
 from .regex import ID
 from .rich_text import RichText, Url
 from .root import Root, format_datetime
+from .simple import Icon
 
 
 class _BlockCommon(Root):
@@ -86,13 +91,13 @@ class BulletedListItem(_BlockCommon):
         children: list[BlockUnion] | None = None
 
     type: Literal["bulleted_list_item"]
-    bulleted_list_item: list[RichText]
+    bulleted_list_item: _BulletedData
 
 
 class Callout(_BlockCommon):
     class _CalloutData(Root):
         rich_text: list[RichText]
-        icon: str | None = None
+        icon: Icon | None = None
         color: Color = Color.DEFAULT
 
     type: Literal["callout"]

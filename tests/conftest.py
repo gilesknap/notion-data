@@ -35,5 +35,6 @@ def ids():
         plain_page_id = "da6398fd210540919fc0bd70e33f18c7"
         block_id = "d91a45aac9d54c6f832bf3b2b871c4da"
         user_id = "cbb991ef-0db4-4c20-a298-ce5aad994d09"
+        root_page_id = "8e0d8f87b513486f8a3cea085ce5c308"
 
     return Ids()

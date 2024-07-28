@@ -19,7 +19,7 @@ def test_make_page(client, ids):
         cover=file(url="https://www.notion.so/images/page-cover/webb2.jpg"),
         icon=Icon(emoji="🚀"),
         has_children=False,
-        parent=(PageParent(page_id=ids.plain_page_id)),
+        parent=(PageParent(page_id=ids.root_page_id)),
         properties=add_properties(title=title("Generated Test Page")),
     )
 
@@ -39,7 +39,7 @@ def test_make_page(client, ids):
     client.pages.update(page_id=new_page.id, in_trash=True)
 
 
-def test_make_page_children(client, ids):
+def test_make_page_blocks(client, ids):
     p1 = paragraph(rich_text=rich_text("This is a rich text object"))
     p2 = paragraph(rich_text=rich_text("This is another rich text object"))
     p3 = paragraph(rich_text=rich_text("This is a third rich text object"))
@@ -51,7 +51,7 @@ def test_make_page_children(client, ids):
         last_edited_by=NotionUser(id=ids.user_id),
         cover=file(url="https://www.notion.so/images/page-cover/webb2.jpg"),
         icon=Icon(emoji="🚀"),
-        parent=(PageParent(page_id=ids.plain_page_id)),
+        parent=(PageParent(page_id=ids.root_page_id)),
         properties=add_properties(title=title("Generated Test Page with Blocks")),
     )
 
@@ -61,16 +61,49 @@ def test_make_page_children(client, ids):
     )
     new_page = Page(**result)
 
-    # add the children to the page
+    # add the child blocks to the page
     result = client.blocks.children.append(
         children=blocks.model_dump(exclude_unset=True, by_alias=True),
         block_id=new_page.id,
     )
 
-    # fetch the page to see if the children were added
+    # fetch the child blocks from the page
     result = client.blocks.children.list(block_id=new_page.id)
     blocks = Blocks(**result)
 
-    pass
     # delete the page we just created
-    # client.pages.update(page_id=new_page.id, in_trash=True)
+    client.pages.update(page_id=new_page.id, in_trash=True)
+
+
+def test_get_page_blocks(client, ids):
+    # get the blocks of a page
+    result = client.blocks.children.list(block_id=ids.plain_page_id)
+    pprint(result)
+    blocks = Blocks(**result)
+    pprint(blocks.model_dump())
+
+    new_page = Page(
+        cover=file(url="https://www.notion.so/images/page-cover/webb2.jpg"),
+        icon=Icon(emoji="🚀"),
+        parent=(PageParent(page_id=ids.root_page_id)),
+        properties=add_properties(
+            title=title("Generated Test Page copied from TESTING STD Page")
+        ),
+    )
+
+    # create the initial page
+    result = client.pages.create(
+        **new_page.model_dump(exclude_unset=True, by_alias=True),
+    )
+    new_page_result = Page(**result)
+
+    # fetch the child blocks of the page we are copying
+    blocks_result = client.blocks.children.list(block_id=ids.plain_page_id)
+    blocks = Blocks(**blocks_result)
+    new_blocks = BlocksList(blocks.results)
+
+    # add the children to the page
+    result = client.blocks.children.append(
+        children=new_blocks.model_dump(exclude_unset=True, by_alias=True),
+        block_id=new_page_result.id,
+    )
